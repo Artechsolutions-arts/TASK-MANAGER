@@ -381,28 +381,23 @@ export default function WorkSheetPage() {
 
     setIsGeneratingTasks(true);
     try {
-      const tasksToCreate: WorkSheetCreate[] = workingDays.map((day, index) => {
+      const created = workingDays.map((day, index) => {
         const dateStr = format(day, 'yyyy-MM-dd');
-        // Generate sequential Task ID: TSK01, TSK02, TSK03, etc.
         const taskNumber = (index + 1).toString().padStart(2, '0');
         const taskId = `TSK${taskNumber}`;
-        
-        // Skip if task already exists for this date
-        if (existingDates.has(dateStr)) {
-          return null;
-        }
-
+        if (existingDates.has(dateStr)) return null;
         return {
           sheet_name: selectedSheet,
           task_id: taskId,
-          task_name: `Daily Work - ${format(day, 'EEEE, dd MMM yyyy')}`, // e.g., "Monday, 01 Jan 2024"
+          task_name: `Daily Work - ${format(day, 'EEEE, dd MMM yyyy')}`,
           start_date: dateStr,
           due_date: dateStr,
           status: 'IN-PROGRESS',
           completion_percentage: 0,
           notes: '',
         };
-      }).filter((task): task is WorkSheetCreate => task !== null);
+      });
+      const tasksToCreate = created.filter((t): t is NonNullable<typeof t> => t != null) as WorkSheetCreate[];
 
       // Create all tasks
       for (const task of tasksToCreate) {

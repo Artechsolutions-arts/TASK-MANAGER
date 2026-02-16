@@ -501,10 +501,10 @@ export default function TeamDiscussionSection({ taskIds, projectId }: TeamDiscus
                   )}
 
                   {/* Image Count Indicator (fallback) */}
-                  {(!images || images.length === 0) && activity.metadata?.image_count > 0 && (
+                  {(!images || images.length === 0) && (activity.metadata?.image_count ?? 0) > 0 && (
                     <div className="mt-2 flex items-center text-xs text-gray-500 dark:text-gray-400">
                       <ImageIcon className="w-3 h-3 mr-1" />
-                      {activity.metadata.image_count} image(s) attached
+                      {activity.metadata?.image_count} image(s) attached
                     </div>
                   )}
                 </div>

@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { List } from 'react-window';
+import { FixedSizeList } from 'react-window';
 import { parseISO, format } from 'date-fns';
 
 const ROW_HEIGHT = 92;
@@ -95,12 +95,12 @@ export default function VirtualTaskList({
   emptyMessage = 'No tasks in this section',
 }: VirtualTaskListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(500);
+  const [size, setSize] = useState({ height: 500, width: 800 });
 
   useEffect(() => {
     if (!containerRef.current) return;
     const el = containerRef.current;
-    const update = () => setHeight(el.clientHeight || 500);
+    const update = () => setSize({ height: el.clientHeight || 500, width: el.clientWidth || 800 });
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
@@ -117,14 +117,23 @@ export default function VirtualTaskList({
 
   return (
     <div ref={containerRef} className="flex-1 min-h-0" style={{ minHeight: 200 }}>
-      <List<RowProps>
-        rowComponent={TaskRow}
-        rowProps={{ tasks, onSelectTask }}
-        rowCount={tasks.length}
-        rowHeight={ROW_HEIGHT}
-        style={{ height, width: '100%' }}
+      <FixedSizeList
+        height={size.height}
+        width={size.width}
+        itemCount={tasks.length}
+        itemSize={ROW_HEIGHT}
         overscanCount={4}
-      />
+      >
+        {({ index, style }) => (
+          <TaskRow
+            index={index}
+            style={style}
+            ariaAttributes={{ role: 'listitem', 'aria-posinset': index + 1, 'aria-setsize': tasks.length }}
+            tasks={tasks}
+            onSelectTask={onSelectTask}
+          />
+        )}
+      </FixedSizeList>
     </div>
   );
 }

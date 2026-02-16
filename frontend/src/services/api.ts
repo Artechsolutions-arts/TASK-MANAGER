@@ -382,6 +382,7 @@ export const activityAPI = {
     content?: string;
     hours?: number;
     work_date?: string;
+    metadata?: Record<string, unknown>;
   }): Promise<Activity> => {
     const response = await api.post('/activity', data);
     return response.data;

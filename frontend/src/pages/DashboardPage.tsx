@@ -413,7 +413,6 @@ export default function DashboardPage() {
                       border: '1px solid #E5E7EB',
                       borderRadius: '8px',
                     }}
-                    className="dark:bg-gray-800 dark:border-gray-700"
                   />
                   <Bar 
                     dataKey="tasks" 

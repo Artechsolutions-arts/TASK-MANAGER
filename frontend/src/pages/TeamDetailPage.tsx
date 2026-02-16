@@ -54,7 +54,7 @@ export default function TeamDetailPage() {
         team_lead_id: team.team_lead_id,
       });
       // Get current member IDs
-      const currentMemberIds = (team as TeamWithMembers).members?.map((m: TeamMember) => m.user_id) || [];
+      const currentMemberIds = (team as unknown as TeamWithMembers).members?.map((m: TeamMember) => m.user_id) || [];
       setSelectedMemberIds(currentMemberIds);
     }
   }, [team]);
@@ -121,7 +121,7 @@ export default function TeamDetailPage() {
     });
 
     // Get current member IDs from team
-    const currentMemberIds = (team as TeamWithMembers).members?.map((m: TeamMember) => m.user_id) || [];
+    const currentMemberIds = (team as unknown as TeamWithMembers).members?.map((m: TeamMember) => m.user_id) || [];
     
     // Add new members
     const membersToAdd = selectedMemberIds.filter(id => !currentMemberIds.includes(id));
@@ -143,7 +143,7 @@ export default function TeamDetailPage() {
         description: team.description || '',
         team_lead_id: team.team_lead_id,
       });
-      const currentMemberIds = (team as TeamWithMembers).members?.map((m: TeamMember) => m.user_id) || [];
+      const currentMemberIds = (team as unknown as TeamWithMembers).members?.map((m: TeamMember) => m.user_id) || [];
       setSelectedMemberIds(currentMemberIds);
     }
     setIsEditMode(false);
@@ -179,7 +179,7 @@ export default function TeamDetailPage() {
     );
   }
 
-  const teamWithMembers = team as TeamWithMembers;
+  const teamWithMembers = team as unknown as TeamWithMembers;
   const members = teamWithMembers.members || [];
 
   return (

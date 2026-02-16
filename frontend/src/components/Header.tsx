@@ -72,9 +72,9 @@ export default function Header() {
   };
 
   // Generate breadcrumbs based on current path
-  const getBreadcrumbs = () => {
+  const getBreadcrumbs = (): { label: string; path: string; isProjectId?: boolean }[] => {
     const paths = location.pathname.split('/').filter(Boolean);
-    const breadcrumbs = [{ label: 'Home', path: '/' }];
+    const breadcrumbs: { label: string; path: string; isProjectId?: boolean }[] = [{ label: 'Home', path: '/' }];
 
     if (paths.length === 0) return breadcrumbs;
 

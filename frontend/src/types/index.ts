@@ -103,6 +103,7 @@ export interface Team {
   description?: string;
   organization_id: string;
   team_lead_id: string;
+  members?: TeamMember[];
   created_at: string;
   updated_at: string;
 }

@@ -36,14 +36,11 @@ export default function ReportsPage() {
   });
 
   // Fetch workload data
-  const { data: workloadData = [], error: workloadError } = useQuery({
+  const { data: workloadData, error: workloadError } = useQuery({
     queryKey: ['workload'],
     queryFn: () => analyticsAPI.getWorkload(),
-    onError: (error: any) => {
-      console.error('Workload error:', error);
-      // If user doesn't have permission, that's okay - just show empty state
-    },
   });
+  const workloadList = Array.isArray(workloadData) ? workloadData : [];
 
   // Fetch burndown data if project is selected
   const { data: burndownData = [] } = useQuery({
@@ -56,7 +53,7 @@ export default function ReportsPage() {
   });
 
   // Prepare workload chart data
-  const workloadChartData = (workloadData || []).map((item: any) => ({
+  const workloadChartData = workloadList.map((item: any) => ({
     name: item.user_name?.split(' ')[0] || 'User', // First name only
     tasks: Number(item.task_count || 0),
     completed: Number(item.completed_task_count || 0),
@@ -201,7 +198,7 @@ export default function ReportsPage() {
             {/* Workload Chart */}
             <div className="card p-6 bg-white">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Team Workload</h2>
-              {workloadError?.response?.status === 403 ? (
+              {(workloadError as any)?.response?.status === 403 ? (
                 <div className="h-[300px] flex items-center justify-center text-gray-500">
                   You don't have permission to view workload data
                 </div>
@@ -310,8 +307,8 @@ export default function ReportsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {workloadData && workloadData.length > 0 ? (
-                    workloadData.map((item: any) => {
+                  {workloadList.length > 0 ? (
+                    workloadList.map((item: any) => {
                       const totalHours = typeof item.total_hours === 'number' 
                         ? item.total_hours 
                         : Number(item.total_hours || 0);
@@ -334,7 +331,7 @@ export default function ReportsPage() {
                   ) : (
                     <tr>
                       <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500">
-                        {workloadError?.response?.status === 403 
+                        {(workloadError as any)?.response?.status === 403 
                           ? 'You don\'t have permission to view workload data'
                           : 'No workload data available'}
                       </td>

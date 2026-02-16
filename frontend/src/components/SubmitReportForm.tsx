@@ -17,6 +17,7 @@ export default function SubmitReportForm() {
     content: '',
     progress_percentage: 0,
   });
+  const [attachments, setAttachments] = useState<{ file: File }[]>([]);
   const [error, setError] = useState('');
 
   // Fetch projects and tasks based on role
@@ -34,7 +35,7 @@ export default function SubmitReportForm() {
   const submitReportMutation = useMutation({
     mutationFn: async (data: any) => {
       // Convert files to base64
-      const attachmentPromises = attachments.map(async (att) => {
+      const attachmentPromises = attachments.map(async (att: { file: File }) => {
         return new Promise<{ file_name: string; file_type: string; file_data: string; file_size: number }>((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => {
