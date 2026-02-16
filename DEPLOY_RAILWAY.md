@@ -74,6 +74,7 @@
 - **No custom Start command:** In **Settings → Deploy**, leave **Custom Start Command** empty so the image’s `ENTRYPOINT` (`/app/entrypoint.sh`) runs and the app binds to the correct port.
 - **Set variables for full API:** Add `DATABASE_URL` and `SECRET_KEY` in **Variables** so login and data work (app can start without them for healthcheck).
 - **Allow MongoDB from anywhere:** In MongoDB Atlas → Network Access, add `0.0.0.0/0` so Railway’s IPs can connect.
+- **Check deploy logs:** In Railway → **Deployments** → click the failed deployment → **View Logs**. Look for “Uvicorn running on http://0.0.0.0:8080” (or the port shown) and any Python tracebacks. If the app crashes on import or startup, the healthcheck will keep failing.
 
 ---
 

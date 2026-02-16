@@ -78,12 +78,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.get("/health")
 async def health_check():
-    """Liveness: is the process up."""
-    return JSONResponse(content={"status": "healthy", "service": "task-management-api"})
-
-
-@app.get("/health")
-async def liveness_check():
     """Liveness: is the process up? Always 200 so Railway/load balancers don't kill the container."""
     return {"status": "ok"}
 

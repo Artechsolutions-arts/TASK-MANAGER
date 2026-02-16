@@ -14,10 +14,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Railway uses port 8080; entrypoint reads $PORT (Railway sets it)
+# Ensure shell script has Unix line endings (avoids "bad interpreter" in container)
+RUN sed -i 's/\r$//' entrypoint.sh 2>/dev/null || true
 RUN chmod +x entrypoint.sh
+
 ENV PORT=8080
 EXPOSE 8080
 
-# Use absolute path so entrypoint runs regardless of how the container is started
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Run via shell so $PORT is always expanded (Railway sets PORT; default 8080)
+CMD ["/bin/sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
