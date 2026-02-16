@@ -139,6 +139,21 @@ async def seed_organization_and_users(role_map: dict):
     
     # Create demo users with hierarchy
     demo_users = [
+        # Artech users (CEO & Admin)
+        {
+            "email": "radhika.y@artechsolution.co.in",
+            "password": "Ceo123",
+            "first_name": "Radhika",
+            "last_name": "Y",
+            "role": "CEO"
+        },
+        {
+            "email": "admin@artechsolution.co.in",
+            "password": "admin123",
+            "first_name": "Admin",
+            "last_name": "Artech",
+            "role": "Admin"
+        },
         # CEO Level (Top Management)
         {
             "email": "ceo@demo.com",
@@ -463,9 +478,11 @@ async def main():
         
         # Display by hierarchy with passwords
         print("\n📊 CEO Level (Top Management):")
+        print("  • Radhika Y: radhika.y@artechsolution.co.in / Ceo123")
         print("  • John Smith: ceo@demo.com / ceo123")
         print("  • Sarah Johnson: director@demo.com / director123")
         print("\n🔐 Admin (Employee management only - create, change password, delete):")
+        print("  • Admin Artech: admin@artechsolution.co.in / admin123")
         print("  • Admin User: admin@demo.com / admin123")
         print("\n👔 Manager Level (Project Managers):")
         print("  • Jane Williams: manager@demo.com / manager123")
@@ -498,7 +515,7 @@ async def main():
         print("  • Ryan Allen: dev13@demo.com / dev123")
         
         print("\n" + "="*60)
-        print(f"Total Users: 29 (2 CEOs, 1 Admin, 4 Managers, 6 Team Leads, 16 Members)")
+        print(f"Total Users: 31 (3 CEOs, 2 Admins, 4 Managers, 6 Team Leads, 16 Members)")
         print("="*60)
     except Exception as e:
         print(f"❌ Error seeding data: {e}")
