@@ -21,5 +21,5 @@ RUN chmod +x entrypoint.sh
 ENV PORT=8080
 EXPOSE 8080
 
-# Run via shell so $PORT is always expanded (Railway sets PORT; default 8080)
-CMD ["/bin/sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+# Read PORT from env in Python so it works even when Railway runs without a shell
+CMD ["python", "start.py"]
