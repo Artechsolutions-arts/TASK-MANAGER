@@ -8,4 +8,5 @@ nixPkgs = ["python311"]
 cmds = ["pip install -r requirements.txt"]
 
 [start]
-cmd = "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+# PORT is set by Railway; must match for healthcheck to succeed
+cmd = "sh -c 'uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}'"

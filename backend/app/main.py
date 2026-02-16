@@ -15,9 +15,12 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    await init_db()
-    logger.info("MongoDB connection initialized")
+    # Startup: init DB but don't fail app if DB unreachable (so healthcheck can pass)
+    try:
+        await init_db()
+        logger.info("MongoDB connection initialized")
+    except Exception as e:
+        logger.exception("MongoDB init failed (app will start anyway): %s", e)
     yield
     # Shutdown
     await close_db()
@@ -77,6 +80,12 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def health_check():
     """Liveness: is the process up."""
     return JSONResponse(content={"status": "healthy", "service": "task-management-api"})
+
+
+@app.get("/health")
+async def liveness_check():
+    """Liveness: is the process up? Always 200 so Railway/load balancers don't kill the container."""
+    return {"status": "ok"}
 
 
 @app.get("/ready")
