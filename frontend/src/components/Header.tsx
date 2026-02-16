@@ -38,7 +38,7 @@ export default function Header() {
     }
   }, [location.pathname, searchParams]);
 
-  // Close dropdowns when clicking outside
+  // Close dropdowns when clicking outside (use 'click' so menu item clicks fire before close)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -61,8 +61,8 @@ export default function Header() {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   // Helper to check if a string is a UUID
@@ -372,28 +372,22 @@ export default function Header() {
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowUserMenu(false);
-                  navigate('/settings');
-                }}
+              <Link
+                to="/settings"
+                onClick={() => setShowUserMenu(false)}
                 className="w-full flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
               >
                 <SettingsIcon className="w-4 h-4 mr-2 flex-shrink-0" />
                 Settings
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowUserMenu(false);
-                  navigate('/settings');
-                }}
+              </Link>
+              <Link
+                to="/settings"
+                onClick={() => setShowUserMenu(false)}
                 className="w-full flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
               >
                 <Users className="w-4 h-4 mr-2 flex-shrink-0" />
                 Profile
-              </button>
+              </Link>
               <div className="border-t border-gray-200 dark:border-gray-700 mt-1">
                 <button
                   onClick={() => {
