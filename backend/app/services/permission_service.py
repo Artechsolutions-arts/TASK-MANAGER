@@ -1,4 +1,5 @@
 from typing import List, Optional
+from beanie.operators import In
 from app.models.user import User, UserRole, Role, RolePermission, Permission
 from app.services.cache_service import cache_get, cache_set, cache_key_user_roles
 import uuid
@@ -56,6 +57,12 @@ class PermissionService:
         if not role_ids:
             return False
         
+        # CEO has all permissions (bypass role_permissions lookup)
+        roles = await Role.find(In(Role.id, role_ids)).to_list()
+        role_names = [r.name for r in roles]
+        if "CEO" in role_names:
+            return True
+        
         # Check if any role has the required permission
         permission = await Permission.find_one(
             Permission.resource == resource,
@@ -66,12 +73,10 @@ class PermissionService:
             return False
         
         # Check if any of the user's roles have this permission
-        # Beanie supports finding with role_id in list
         role_permissions = await RolePermission.find(
             RolePermission.permission_id == permission.id
         ).to_list()
         
-        # Check if any role_permission has a role_id in our role_ids
         has_permission = any(rp.role_id in role_ids for rp in role_permissions)
         
         return has_permission

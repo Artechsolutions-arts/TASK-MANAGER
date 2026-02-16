@@ -372,22 +372,28 @@ export default function Header() {
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
               </div>
-              <Link
-                to="/settings"
-                onClick={() => setShowUserMenu(false)}
-                className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              <button
+                type="button"
+                onClick={() => {
+                  setShowUserMenu(false);
+                  navigate('/settings');
+                }}
+                className="w-full flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
               >
-                <SettingsIcon className="w-4 h-4 mr-2" />
+                <SettingsIcon className="w-4 h-4 mr-2 flex-shrink-0" />
                 Settings
-              </Link>
-              <Link
-                to="/settings"
-                onClick={() => setShowUserMenu(false)}
-                className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowUserMenu(false);
+                  navigate('/settings');
+                }}
+                className="w-full flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
               >
-                <Users className="w-4 h-4 mr-2" />
+                <Users className="w-4 h-4 mr-2 flex-shrink-0" />
                 Profile
-              </Link>
+              </button>
               <div className="border-t border-gray-200 dark:border-gray-700 mt-1">
                 <button
                   onClick={() => {
