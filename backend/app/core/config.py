@@ -31,8 +31,13 @@ class Settings(BaseSettings):
     @classmethod
     def parse_cors_origins(cls, v):
         if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",") if origin.strip()]
-        return v
+            origins = [origin.strip() for origin in v.split(",") if origin.strip()]
+        elif isinstance(v, list):
+            origins = list(v)
+        else:
+            return ["http://localhost:5173", "http://localhost:3000"]
+        # Strip trailing slashes so "https://app.up.railway.app/" matches browser Origin
+        return [o.rstrip("/") for o in origins]
     
     class Config:
         env_file = ".env"

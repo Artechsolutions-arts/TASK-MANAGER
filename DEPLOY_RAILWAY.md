@@ -76,6 +76,12 @@
 - **Allow MongoDB from anywhere:** In MongoDB Atlas → Network Access, add `0.0.0.0/0` so Railway’s IPs can connect.
 - **Check deploy logs:** In Railway → **Deployments** → click the failed deployment → **View Logs**. Look for “Uvicorn running on http://0.0.0.0:8080” (or the port shown) and any Python tracebacks. If the app crashes on import or startup, the healthcheck will keep failing.
 
+### Frontend 404 (“The requested path could not be found”)
+
+- Use the **production Dockerfile** (`frontend/Dockerfile`): it builds the app and serves `dist/` with `serve -s dist`. If the frontend was built without this (e.g. Nixpacks with no build step), `dist/` may be missing and every path returns 404.
+- **CORS_ORIGINS:** Set to your frontend origin **without** a trailing slash (e.g. `https://appotime-ar.up.railway.app`). The backend normalizes trailing slashes, but keeping it correct avoids confusion.
+- **VITE_API_URL:** Your backend URL (e.g. `https://appotime.up.railway.app`), no trailing slash. Required at **build time**; redeploy the frontend after changing it.
+
 ---
 
 ## Step 4: Deploy Frontend on Railway
