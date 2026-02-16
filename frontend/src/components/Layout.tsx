@@ -10,8 +10,10 @@ export default function Layout() {
   const location = useLocation();
   const { isAdmin } = useUserRole();
 
-  // Admin: only /employees allowed; redirect "/" or any other path to /employees
-  if (isAdmin && location.pathname !== '/employees') {
+  // Admin: allow /employees and /settings (profile); redirect other paths to /employees
+  const adminAllowedPaths = ['/employees', '/settings'];
+  const isAllowedForAdmin = adminAllowedPaths.some((p) => location.pathname === p || location.pathname.startsWith(p + '/'));
+  if (isAdmin && !isAllowedForAdmin) {
     return <Navigate to="/employees" replace />;
   }
 
