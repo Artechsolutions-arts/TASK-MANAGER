@@ -71,7 +71,7 @@
 ### If healthcheck fails (“service unavailable” / “replicas never became healthy”)
 
 - **Use Dockerfile:** In the service, go to **Settings → Build**. Set **Builder** to **Dockerfile** (not Railpack). Redeploy. The `backend/Dockerfile` is set up to listen on Railway’s `PORT`.
-- **Set required variables:** If `DATABASE_URL` or `SECRET_KEY` are missing, the app crashes on startup and never answers `/health`. Add both in **Variables** and redeploy.
+- **Set variables for full API:** Add `DATABASE_URL` and `SECRET_KEY` in **Variables** so login and data work (app can start without them for healthcheck).
 - **Allow MongoDB from anywhere:** In MongoDB Atlas → Network Access, add `0.0.0.0/0` so Railway’s IPs can connect.
 
 ---

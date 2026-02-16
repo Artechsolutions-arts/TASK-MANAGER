@@ -5,15 +5,15 @@ import os
 
 
 class Settings(BaseSettings):
-    # Database
-    DATABASE_URL: str
+    # Database (default so app can start for healthcheck; set in production)
+    DATABASE_URL: str = "mongodb://localhost:27017/appotime"
     DATABASE_TEST_URL: str = ""
-    
+
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
-    
-    # JWT
-    SECRET_KEY: str
+
+    # JWT (default so app can start; must set SECRET_KEY in production)
+    SECRET_KEY: str = "change-me-in-production-min-32-chars"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7

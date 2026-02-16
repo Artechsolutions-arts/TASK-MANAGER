@@ -14,9 +14,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Railway and other platforms inject PORT at runtime
+# Entrypoint ensures PORT is always expanded (Railway may override CMD without a shell)
+RUN chmod +x entrypoint.sh
 ENV PORT=8000
-EXPOSE $PORT
+EXPOSE 8000
 
-# Use shell form so $PORT is expanded at runtime (Railway sets PORT)
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+# Clear any Railway-injected start command by using entrypoint; PORT is read inside the script
+ENTRYPOINT ["./entrypoint.sh"]
