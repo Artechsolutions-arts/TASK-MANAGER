@@ -180,7 +180,7 @@ export default function SettingsPage() {
     <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">Settings</h1>
-        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Manage your account and preferences</p>
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Manage your account and preferences</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -195,7 +195,7 @@ export default function SettingsPage() {
                   className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${
                     activeTab === tab.id
                       ? 'bg-primary-500 dark:bg-primary-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white'
                   }`}
                 >
                   <span className="mr-2">{tab.icon}</span>
@@ -212,8 +212,8 @@ export default function SettingsPage() {
             <div
               className={`mb-4 p-4 rounded-md ${
                 message.type === 'success'
-                  ? 'bg-green-50 text-green-800 border border-green-200'
-                  : 'bg-red-50 text-red-800 border border-red-200'
+                  ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-700'
+                  : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-700'
               }`}
             >
               {message.text}
@@ -251,7 +251,7 @@ export default function SettingsPage() {
                     )}
                   </div>
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                       Profile Picture
                     </label>
                     <div className="flex items-center space-x-3">
@@ -280,7 +280,7 @@ export default function SettingsPage() {
                         </button>
                       )}
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
                       JPG, PNG or GIF. Max size 5MB.
                     </p>
                   </div>
@@ -288,7 +288,7 @@ export default function SettingsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                       First Name
                     </label>
                     <input
@@ -302,7 +302,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                       Last Name
                     </label>
                     <input
@@ -317,7 +317,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Email</label>
                   <input
                     type="email"
                     value={profileData.email}
@@ -347,7 +347,7 @@ export default function SettingsPage() {
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Theme Settings</h2>
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
                     Choose Theme
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -420,7 +420,7 @@ export default function SettingsPage() {
                       </div>
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
+                  <p className="text-xs text-gray-500 dark:text-gray-300 mt-3">
                     Current theme: <span className="font-medium">{resolvedTheme === 'light' ? 'Light' : 'Dark'}</span>
                     {theme === 'system' && ' (following system preference)'}
                   </p>
@@ -432,15 +432,15 @@ export default function SettingsPage() {
           {/* Preferences Tab */}
           {activeTab === 'preferences' && (
             <div className="card p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Preferences</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Preferences</h2>
               <form onSubmit={handlePreferencesUpdate} className="space-y-4">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
                         Email Notifications
                       </label>
-                      <p className="text-xs text-gray-500">Receive email notifications</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-300">Receive email notifications</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -454,14 +454,14 @@ export default function SettingsPage() {
                         }
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+                      <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
                     </label>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Task Reminders</label>
-                      <p className="text-xs text-gray-500">Get reminders for upcoming tasks</p>
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Task Reminders</label>
+                      <p className="text-xs text-gray-500 dark:text-gray-300">Get reminders for upcoming tasks</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -475,14 +475,14 @@ export default function SettingsPage() {
                         }
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+                      <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
                     </label>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Weekly Digest</label>
-                      <p className="text-xs text-gray-500">Receive weekly summary emails</p>
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Weekly Digest</label>
+                      <p className="text-xs text-gray-500 dark:text-gray-300">Receive weekly summary emails</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -496,7 +496,7 @@ export default function SettingsPage() {
                         }
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+                      <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
                     </label>
                   </div>
 
@@ -517,10 +517,10 @@ export default function SettingsPage() {
           {/* Security Tab */}
           {activeTab === 'security' && (
             <div className="card p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Change Password</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Change Password</h2>
               <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                     Current Password
                   </label>
                   <input
@@ -529,12 +529,12 @@ export default function SettingsPage() {
                     onChange={(e) =>
                       setSecurityData({ ...securityData, current_password: e.target.value })
                     }
-                    className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                     New Password
                   </label>
                   <input
@@ -543,16 +543,16 @@ export default function SettingsPage() {
                     onChange={(e) =>
                       setSecurityData({ ...securityData, new_password: e.target.value })
                     }
-                    className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                     required
                     minLength={8}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
                     Password must be at least 8 characters long
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                     Confirm New Password
                   </label>
                   <input
@@ -561,7 +561,7 @@ export default function SettingsPage() {
                     onChange={(e) =>
                       setSecurityData({ ...securityData, confirm_password: e.target.value })
                     }
-                    className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                     required
                     minLength={8}
                   />
