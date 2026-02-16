@@ -6,6 +6,7 @@ builder = "nixpacks"
 buildCommand = "npm ci && npm run build"
 
 [deploy]
-startCommand = "npx serve -s dist -l $PORT"
+# Railway runs without shell so $PORT isn't expanded; use shell and default 8080
+startCommand = "/bin/sh -c 'npx serve -s dist -l ${PORT:-8080}'"
 # If Railway detects static site, you may only need publish directory:
 # watchPatterns = ["dist"]

@@ -37,7 +37,8 @@ services:
       dockerfile: Dockerfile
     container_name: taskmanager_backend
     environment:
-      DATABASE_URL: mongodb://admin:admin@mongodb:27017/appotime?authSource=admin
+      # Use Atlas: set DATABASE_URL in .env to your mongodb+srv://... URI
+      DATABASE_URL: ${DATABASE_URL:-mongodb://admin:admin@mongodb:27017/appotime?authSource=admin}
       REDIS_URL: redis://redis:6379/0
       SECRET_KEY: ${SECRET_KEY:-change-this-secret-key-in-production-min-32-chars}
       ALGORITHM: HS256
@@ -65,7 +66,7 @@ services:
       dockerfile: Dockerfile
     container_name: taskmanager_celery
     environment:
-      DATABASE_URL: mongodb://admin:admin@mongodb:27017/appotime?authSource=admin
+      DATABASE_URL: ${DATABASE_URL:-mongodb://admin:admin@mongodb:27017/appotime?authSource=admin}
       REDIS_URL: redis://redis:6379/0
       SECRET_KEY: ${SECRET_KEY:-change-this-secret-key-in-production-min-32-chars}
       ALGORITHM: HS256
