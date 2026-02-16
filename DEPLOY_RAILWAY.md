@@ -70,7 +70,8 @@
 
 ### If healthcheck fails (“service unavailable” / “replicas never became healthy”)
 
-- **Use Dockerfile:** In the service, go to **Settings → Build**. Set **Builder** to **Dockerfile** (not Railpack). Redeploy. The `backend/Dockerfile` is set up to listen on Railway’s `PORT`.
+- **Use Dockerfile:** In the service, go to **Settings → Build**. Set **Builder** to **Dockerfile** (not Railpack). Set **Dockerfile Path** to `/backend/Dockerfile` if needed. Redeploy. The app listens on **port 8080** by default (or Railway’s `PORT` when set).
+- **No custom Start command:** In **Settings → Deploy**, leave **Custom Start Command** empty so the image’s `ENTRYPOINT` (`/app/entrypoint.sh`) runs and the app binds to the correct port.
 - **Set variables for full API:** Add `DATABASE_URL` and `SECRET_KEY` in **Variables** so login and data work (app can start without them for healthcheck).
 - **Allow MongoDB from anywhere:** In MongoDB Atlas → Network Access, add `0.0.0.0/0` so Railway’s IPs can connect.
 

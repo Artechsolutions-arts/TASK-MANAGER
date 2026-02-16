@@ -14,10 +14,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Entrypoint ensures PORT is always expanded (Railway may override CMD without a shell)
+# Railway uses port 8080; entrypoint reads $PORT (Railway sets it)
 RUN chmod +x entrypoint.sh
-ENV PORT=8000
-EXPOSE 8000
+ENV PORT=8080
+EXPOSE 8080
 
-# Clear any Railway-injected start command by using entrypoint; PORT is read inside the script
-ENTRYPOINT ["./entrypoint.sh"]
+# Use absolute path so entrypoint runs regardless of how the container is started
+ENTRYPOINT ["/app/entrypoint.sh"]
