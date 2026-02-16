@@ -52,10 +52,9 @@
 2. **Deploy from GitHub repo** → select `Artechsolutions-arts/TASK-MANAGER`.
 3. Add a **service** and set:
    - **Root Directory:** `backend`
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-   - **Watch Paths:** `backend/**`
-4. In the service, open **Variables** and add:
+   - **Builder:** Use **Dockerfile** (Settings → Build → Builder → Dockerfile). The repo’s `backend/Dockerfile` uses `$PORT` so the app listens on Railway’s assigned port and the healthcheck can pass. If you use Railpack instead, ensure the start command includes `--port $PORT`.
+   - If using custom build/start: **Build Command** `pip install -r requirements.txt`, **Start Command** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+4. **Required variables** – the app will not start without these. In the service, open **Variables** and add:
 
    | Variable | Value |
    |----------|--------|
@@ -68,6 +67,12 @@
 
 5. **Settings** → **Networking** → **Generate Domain**.  
    Note the URL (e.g. `https://your-backend.up.railway.app`).
+
+### If healthcheck fails (“service unavailable” / “replicas never became healthy”)
+
+- **Use Dockerfile:** In the service, go to **Settings → Build**. Set **Builder** to **Dockerfile** (not Railpack). Redeploy. The `backend/Dockerfile` is set up to listen on Railway’s `PORT`.
+- **Set required variables:** If `DATABASE_URL` or `SECRET_KEY` are missing, the app crashes on startup and never answers `/health`. Add both in **Variables** and redeploy.
+- **Allow MongoDB from anywhere:** In MongoDB Atlas → Network Access, add `0.0.0.0/0` so Railway’s IPs can connect.
 
 ---
 
