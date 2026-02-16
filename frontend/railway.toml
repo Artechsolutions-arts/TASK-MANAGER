@@ -1,0 +1,11 @@
+# Railway config for Frontend (React/Vite)
+# Set this service's Root Directory to "frontend" in Railway dashboard.
+
+[build]
+builder = "nixpacks"
+buildCommand = "npm ci && npm run build"
+
+[deploy]
+startCommand = "npx serve -s dist -l $PORT"
+# If Railway detects static site, you may only need publish directory:
+# watchPatterns = ["dist"]
