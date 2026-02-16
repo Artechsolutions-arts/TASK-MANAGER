@@ -78,8 +78,10 @@
 
 ### Frontend 404 (“The requested path could not be found”)
 
-- Use the **production Dockerfile** (`frontend/Dockerfile`): it builds the app and serves `dist/` with `serve -s dist`. If the frontend was built without this (e.g. Nixpacks with no build step), `dist/` may be missing and every path returns 404.
-- **CORS_ORIGINS:** Set to your frontend origin **without** a trailing slash (e.g. `https://appotime-ar.up.railway.app`). The backend normalizes trailing slashes, but keeping it correct avoids confusion.
+- **Use the production Dockerfile:** In Railway → **Frontend** → **Settings** → **Build**, set **Builder** to **Dockerfile** and **Dockerfile path** to `Dockerfile` (root directory is `frontend`). The repo’s `frontend/railway.toml` sets this; if the UI still shows Nixpacks, change it manually and **Redeploy**.
+- **Redeploy after changing builder:** After switching to Dockerfile, use **Deployments** → **⋯** → **Redeploy** (or push a small commit) so a new build runs. The “active” deployment must be one that was built with the Dockerfile.
+- **Confirm domain:** In **Frontend** → **Settings** → **Networking**, check which domain is the frontend (e.g. `appotime-ar.up.railway.app`). Open that URL; the backend URL (e.g. `appotime.up.railway.app`) returns JSON at `/`, not the React app.
+- **CORS_ORIGINS:** Set to your frontend origin without a trailing slash (e.g. `https://appotime-ar.up.railway.app`).
 - **VITE_API_URL:** Your backend URL (e.g. `https://appotime.up.railway.app`), no trailing slash. Required at **build time**; redeploy the frontend after changing it.
 
 ---

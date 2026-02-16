@@ -7,7 +7,5 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-# Image CMD already runs serve -s dist; override only if needed (shell expands PORT)
-startCommand = "/bin/sh -c 'exec serve -s dist -l ${PORT:-8080}'"
-# If Railway detects static site, you may only need publish directory:
+# Use image CMD (serve -s dist -l $PORT); do not override so dist/ is definitely served
 # watchPatterns = ["dist"]
