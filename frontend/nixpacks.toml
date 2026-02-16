@@ -1,0 +1,14 @@
+# Nixpacks config for Frontend (Node/React/Vite)
+# Set Root Directory to "frontend" in Railway for this service.
+
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npx serve -s dist -l ${PORT:-3000}"

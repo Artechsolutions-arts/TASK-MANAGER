@@ -1,0 +1,12 @@
+# Default Railway config when using repo root.
+# For a single backend service: set Root Directory to "backend" in Railway
+# so backend/railway.toml and backend/nixpacks.toml are used instead.
+
+[build]
+builder = "nixpacks"
+buildCommand = "cd backend && pip install -r requirements.txt"
+
+[deploy]
+startCommand = "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/ready"
+healthcheckTimeout = 30
