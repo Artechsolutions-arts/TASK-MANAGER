@@ -106,7 +106,7 @@ export default function Sidebar({ onExpandedChange }: { onExpandedChange?: (expa
       </div>
 
       {/* Navigation Items - consistent alignment for all tabs */}
-      <nav className="flex-1 px-3 py-4 overflow-y-auto overflow-x-hidden">
+      <nav className="flex-1 px-3 py-4 overflow-y-auto overflow-x-hidden scrollbar-modern">
         <ul className="flex flex-col gap-1 list-none p-0 m-0" role="list">
           {navItems.map((item) => {
             const active = isActive(item.path);
