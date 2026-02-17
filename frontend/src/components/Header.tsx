@@ -192,7 +192,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
-      <div className="h-16 flex items-center justify-between gap-2 sm:gap-4 px-4 sm:px-6 w-full min-w-0 overflow-hidden">
+      <div className="h-16 flex items-center justify-between gap-2 sm:gap-4 px-4 sm:px-6 w-full min-w-0 overflow-visible">
         {/* Breadcrumbs - left aligned */}
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0 flex-1">
           {breadcrumbsWithNames.map((crumb, index) => (
