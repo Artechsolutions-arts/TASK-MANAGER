@@ -42,10 +42,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen h-screen flex bg-white dark:bg-gray-900 overflow-hidden">
-      {/* Left Side - Login Form */}
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
-        <div className="max-w-md w-full space-y-10 py-16">
+    <div className="min-h-screen h-screen flex bg-white dark:bg-gray-900 overflow-hidden min-w-0">
+      {/* Left Side - Login Form: scrollable when content overflows (short/tall screens) */}
+      <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-y-auto">
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 bg-white dark:bg-gray-900">
+          <div className="max-w-md w-full space-y-6 sm:space-y-8 lg:space-y-10">
           {/* Logo + Brand name - logo bigger than text (match reference) */}
           <div className="flex items-center justify-center sm:justify-start gap-3">
             <img src={loginLogo} alt="Taskfyi" className="h-20 w-20 object-contain flex-shrink-0" />
@@ -58,7 +59,7 @@ export default function LoginPage() {
             <p className="text-base text-gray-600 dark:text-gray-400">Please enter your credentials</p>
           </div>
 
-          <form className="mt-10 space-y-6" onSubmit={handleSubmit}>
+          <form className="mt-6 sm:mt-8 lg:mt-10 space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 border border-red-200 dark:border-red-800">
                 <div className="text-sm text-red-800 dark:text-red-300">{error}</div>
@@ -146,11 +147,12 @@ export default function LoginPage() {
             </button>
 
           </form>
+          </div>
         </div>
       </div>
 
       {/* Right Side - LogoF.png fills entire panel, no cropping at edges */}
-      <div className="hidden lg:block lg:flex-1 relative overflow-hidden h-screen min-h-0">
+      <div className="hidden lg:block lg:flex-1 relative overflow-hidden h-screen min-h-0 min-w-0">
         <img
           src={loginRightImage}
           alt="Taskfyi"
