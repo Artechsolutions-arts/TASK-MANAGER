@@ -8,22 +8,22 @@ interface AppotimeLogoProps {
 
 export default function AppotimeLogo({ size = 'md', showText = false, className = '' }: AppotimeLogoProps) {
   const sizeClasses = {
-    sm: 'w-8 h-8',
-    md: 'w-10 h-10',
-    lg: 'w-11 h-11',
-    xl: 'w-12 h-12'
+    sm: 'w-10 h-10',
+    md: 'w-12 h-12',
+    lg: 'w-14 h-14',
+    xl: 'w-16 h-16'
   };
 
   const textSizes = {
     sm: 'text-xs',
     md: 'text-sm',
     lg: 'text-base',
-    xl: 'text-3xl'
+    xl: 'text-xl'
   };
   
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      {/* Logo ~1.5–1.8x text height, gap ~1/4 logo width (match reference) */}
+      {/* Logo clearly bigger than text (match reference) */}
       <img 
         src={logoImage} 
         alt="Taskfyi Logo" 
