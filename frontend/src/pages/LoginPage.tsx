@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Eye, EyeOff } from 'lucide-react';
-import loginLogo from '../assets/FAVICON.png';
+import loginLogo from '../assets/LOGOFA.png';
 import loginRightImage from '../assets/LogoF.png';
 
 export default function LoginPage() {

@@ -1,4 +1,4 @@
-import logoImage from '../assets/LOGOA.png';
+import logoImage from '../assets/LOGOFA.png';
 
 interface AppotimeLogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
