@@ -42,7 +42,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-white dark:bg-gray-900">
+    <div className="min-h-screen h-screen flex bg-white dark:bg-gray-900 overflow-hidden">
       {/* Left Side - Login Form */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
         <div className="max-w-md w-full space-y-8 py-12">
@@ -148,12 +148,12 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side - LogoF.png fills entire panel */}
-      <div className="hidden lg:block lg:flex-1 relative overflow-hidden min-h-screen">
+      {/* Right Side - LogoF.png fills entire panel, no cropping at edges */}
+      <div className="hidden lg:block lg:flex-1 relative overflow-hidden h-screen min-h-0">
         <img
           src={loginRightImage}
           alt="Appotime"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover object-top"
         />
       </div>
     </div>
