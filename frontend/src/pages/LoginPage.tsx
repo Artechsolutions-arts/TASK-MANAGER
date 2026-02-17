@@ -46,10 +46,10 @@ export default function LoginPage() {
       {/* Left Side - Login Form */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
         <div className="max-w-md w-full space-y-10 py-16">
-          {/* Logo + Brand name - logo bigger than text */}
-          <div className="flex items-center justify-center sm:justify-start gap-3">
-            <img src={loginLogo} alt="Taskfyi" className="h-16 w-16 object-contain flex-shrink-0" />
-            <span className="text-3xl font-bold text-gray-900 dark:text-white whitespace-nowrap leading-none">Taskfyi</span>
+          {/* Logo + Brand name - bigger, less space between logo and text */}
+          <div className="flex items-center justify-center sm:justify-start gap-2">
+            <img src={loginLogo} alt="Taskfyi" className="h-20 w-20 object-contain flex-shrink-0" />
+            <span className="text-4xl font-bold text-gray-900 dark:text-white whitespace-nowrap leading-none">Taskfyi</span>
           </div>
 
           {/* Login Form */}

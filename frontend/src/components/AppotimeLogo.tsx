@@ -8,21 +8,21 @@ interface AppotimeLogoProps {
 
 export default function AppotimeLogo({ size = 'md', showText = false, className = '' }: AppotimeLogoProps) {
   const sizeClasses = {
-    sm: 'w-8 h-8',
-    md: 'w-10 h-10',
-    lg: 'w-12 h-12',
-    xl: 'w-14 h-14'
+    sm: 'w-10 h-10',
+    md: 'w-12 h-12',
+    lg: 'w-14 h-14',
+    xl: 'w-20 h-20'
   };
 
   const textSizes = {
-    sm: 'text-xs',
-    md: 'text-sm',
-    lg: 'text-base',
-    xl: 'text-xl'
+    sm: 'text-sm',
+    md: 'text-base',
+    lg: 'text-lg',
+    xl: 'text-2xl'
   };
   
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center gap-1.5 ${className}`}>
       {/* Logo Image - larger than text */}
       <img 
         src={logoImage} 
