@@ -148,17 +148,13 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side - Logo/Image */}
-      <div className="hidden lg:flex lg:flex-1 relative bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-700 overflow-hidden min-h-screen">
-        <div className="absolute inset-0 flex items-center justify-center p-8">
-          <img
-            src={loginRightImage}
-            alt="Appotime"
-            className="max-w-full max-h-full w-full h-full object-contain"
-          />
-        </div>
-        {/* Optional subtle overlay so text on image stays readable */}
-        <div className="absolute inset-0 bg-gradient-to-t from-purple-900/10 via-transparent to-transparent pointer-events-none" aria-hidden />
+      {/* Right Side - LogoF.png fills entire panel */}
+      <div className="hidden lg:block lg:flex-1 relative overflow-hidden min-h-screen">
+        <img
+          src={loginRightImage}
+          alt="Appotime"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
       </div>
     </div>
   );
