@@ -45,29 +45,30 @@ export default function LoginPage() {
     <div className="min-h-screen h-screen flex bg-white dark:bg-gray-900 overflow-hidden">
       {/* Left Side - Login Form */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
-        <div className="max-w-md w-full space-y-8 py-12">
-          {/* Logo */}
-          <div className="flex items-center justify-center sm:justify-start">
-            <img src={loginLogo} alt="Taskfyi" className="h-14 w-auto object-contain" />
+        <div className="max-w-md w-full space-y-10 py-16">
+          {/* Logo + Brand name - prominent size */}
+          <div className="flex items-center justify-center sm:justify-start gap-3">
+            <img src={loginLogo} alt="Taskfyi" className="h-20 w-auto object-contain" />
+            <span className="text-3xl font-bold text-gray-900 dark:text-white whitespace-nowrap">Taskfyi</span>
           </div>
 
           {/* Login Form */}
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Login</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Please enter your credentials</p>
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Login</h2>
+            <p className="text-base text-gray-600 dark:text-gray-400">Please enter your credentials</p>
           </div>
 
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <form className="mt-10 space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 border border-red-200 dark:border-red-800">
                 <div className="text-sm text-red-800 dark:text-red-300">{error}</div>
               </div>
             )}
 
-            <div className="space-y-4">
+            <div className="space-y-5">
               {/* Email Input */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="email" className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Email
                 </label>
                 <input
@@ -78,14 +79,14 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3.5 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-colors"
                   placeholder="Enter your email"
                 />
               </div>
 
               {/* Password Input */}
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="password" className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -97,7 +98,7 @@ export default function LoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3.5 pr-12 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-colors"
                     placeholder="Enter your password"
                   />
                   <button
@@ -123,13 +124,13 @@ export default function LoginPage() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-purple-600 dark:text-purple-400 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-purple-500 dark:focus:ring-purple-400"
+                  className="w-5 h-5 text-purple-600 dark:text-purple-400 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-purple-500 dark:focus:ring-purple-400"
                 />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Remember me</span>
+                <span className="ml-2 text-base text-gray-700 dark:text-gray-300">Remember me</span>
               </label>
               <Link
                 to="#"
-                className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium"
+                className="text-base text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium"
               >
                 Forgot password?
               </Link>
@@ -139,7 +140,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-purple-400 font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+              className="w-full flex justify-center py-4 px-4 border border-transparent rounded-lg text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-purple-400 font-semibold text-base transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
             >
               {loading ? 'Signing in...' : 'Login'}
             </button>
