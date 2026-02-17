@@ -100,9 +100,9 @@ export default function Sidebar({ onExpandedChange }: { onExpandedChange?: (expa
         onExpandedChange?.(false);
       }}
     >
-      {/* Logo/Brand */}
-      <div className={`h-16 flex items-center px-4 border-b border-gray-200 dark:border-gray-800 ${isExpanded ? 'justify-start' : 'justify-center'}`}>
-        <AppotimeLogo size="md" showText={isExpanded} />
+      {/* Logo/Brand - larger size for clear visibility */}
+      <div className={`h-20 flex items-center px-4 border-b border-gray-200 dark:border-gray-800 ${isExpanded ? 'justify-start' : 'justify-center'}`}>
+        <AppotimeLogo size="xl" showText={isExpanded} />
       </div>
 
       {/* Navigation Items - consistent alignment for all tabs */}
