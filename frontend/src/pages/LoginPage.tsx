@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Eye, EyeOff } from 'lucide-react';
-import AppotimeLogo from '../components/AppotimeLogo';
+import loginLogo from '../assets/LOGOA.png';
 import loginRightImage from '../assets/LogoF.png';
 
 export default function LoginPage() {
@@ -48,7 +48,7 @@ export default function LoginPage() {
         <div className="max-w-md w-full space-y-8 py-12">
           {/* Logo */}
           <div className="flex items-center justify-center sm:justify-start">
-            <AppotimeLogo size="lg" showText={true} />
+            <img src={loginLogo} alt="Taskfyi" className="h-14 w-auto object-contain" />
           </div>
 
           {/* Login Form */}
@@ -152,7 +152,7 @@ export default function LoginPage() {
       <div className="hidden lg:block lg:flex-1 relative overflow-hidden h-screen min-h-0">
         <img
           src={loginRightImage}
-          alt="Appotime"
+          alt="Taskfyi"
           className="absolute inset-0 w-full h-full object-cover object-top"
         />
       </div>

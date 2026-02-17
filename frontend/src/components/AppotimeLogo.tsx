@@ -1,4 +1,4 @@
-import logoImage from '../assets/logo f.png';
+import logoImage from '../assets/LOGOA.png';
 
 interface AppotimeLogoProps {
   size?: 'sm' | 'md' | 'lg';
@@ -24,14 +24,14 @@ export default function AppotimeLogo({ size = 'md', showText = false, className 
       {/* Logo Image */}
       <img 
         src={logoImage} 
-        alt="Appotime Logo" 
+        alt="Taskfyi Logo" 
         className={`${sizeClasses[size]} object-contain flex-shrink-0`}
       />
       
       {/* Text - Show conditionally */}
       {showText && (
         <span className={`${textSizes[size]} font-bold whitespace-nowrap ${className.includes('text-white') ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
-          Appotime
+          Taskfyi
         </span>
       )}
     </div>
