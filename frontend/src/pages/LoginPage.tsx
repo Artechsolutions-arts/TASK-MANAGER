@@ -151,12 +151,12 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side - LogoF.png fully visible at 100% zoom and any resolution */}
-      <div className="hidden lg:flex lg:flex-1 relative overflow-hidden h-screen min-h-0 min-w-0 bg-gradient-to-br from-purple-500/20 via-purple-600/10 to-indigo-700/20 items-center justify-center">
+      {/* Right Side - image fills entire panel, no other background visible */}
+      <div className="hidden lg:block lg:flex-1 relative overflow-hidden h-screen min-h-0 min-w-0">
         <img
           src={loginRightImage}
           alt="Taskfyi"
-          className="max-w-full max-h-full w-full h-full object-contain"
+          className="absolute inset-0 w-full h-full object-cover"
         />
       </div>
     </div>
