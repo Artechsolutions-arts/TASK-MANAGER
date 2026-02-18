@@ -60,7 +60,7 @@ export default function BoardPage() {
   if (!activeProjectId && projects && projects.length > 0) {
     return (
       <div className="px-6 py-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Select a Project</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Select a Project</h1>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
             <Link
@@ -68,8 +68,8 @@ export default function BoardPage() {
               to={`/board?project=${project.id}`}
               className="card card-hover p-6 block"
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">{project.name}</h3>
-              <p className="text-sm text-gray-500">{project.description || 'No description'}</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{project.name}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{project.description || 'No description'}</p>
             </Link>
           ))}
         </div>
@@ -82,10 +82,10 @@ export default function BoardPage() {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               {selectedProject ? selectedProject.name : 'Board'}
             </h1>
-            <p className="text-gray-500">
+            <p className="text-gray-500 dark:text-gray-400">
               {selectedProject ? 'Kanban board view for project tasks' : 'Select a project to view board'}
             </p>
           </div>
@@ -102,7 +102,7 @@ export default function BoardPage() {
         {/* Sprint Selector */}
         {activeProjectId && sprints.length > 0 && (
           <div className="flex items-center gap-3 mb-4">
-            <Rocket className="w-5 h-5 text-gray-400" />
+            <Rocket className="w-5 h-5 text-gray-400 dark:text-gray-500" />
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Sprint:
             </label>
@@ -123,18 +123,18 @@ export default function BoardPage() {
       </div>
 
       {isLoading ? (
-        <div className="card p-12 text-center bg-white">
-          <p className="text-gray-500">Loading board...</p>
+        <div className="card p-12 text-center bg-white dark:bg-gray-800">
+          <p className="text-gray-500 dark:text-gray-400">Loading board...</p>
         </div>
       ) : filteredTasks && filteredTasks.length > 0 ? (
         <KanbanBoard tasks={filteredTasks} projectId={activeProjectId || ''} />
       ) : activeProjectId ? (
-        <div className="card p-12 text-center bg-white">
-          <p className="text-gray-500">No tasks found for this project. Create tasks to get started.</p>
+        <div className="card p-12 text-center bg-white dark:bg-gray-800">
+          <p className="text-gray-500 dark:text-gray-400">No tasks found for this project. Create tasks to get started.</p>
         </div>
       ) : (
-        <div className="card p-12 text-center bg-white">
-          <p className="text-gray-500">Please select a project to view the board.</p>
+        <div className="card p-12 text-center bg-white dark:bg-gray-800">
+          <p className="text-gray-500 dark:text-gray-400">Please select a project to view the board.</p>
         </div>
       )}
     </div>

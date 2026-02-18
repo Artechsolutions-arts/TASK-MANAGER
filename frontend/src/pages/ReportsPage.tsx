@@ -61,21 +61,21 @@ export default function ReportsPage() {
   }));
 
   return (
-    <div className="px-6 py-6 bg-gray-50 min-h-screen">
+    <div className="px-6 py-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Reports</h1>
-        <p className="text-gray-500">Analytics and reporting dashboard</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Reports</h1>
+        <p className="text-gray-500 dark:text-gray-400">Analytics and reporting dashboard</p>
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 border-b border-gray-200">
+      <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab('analytics')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'analytics'
-                ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-500 dark:border-primary-400 text-primary-600 dark:text-primary-400'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
             }`}
           >
             Analytics
@@ -85,8 +85,8 @@ export default function ReportsPage() {
               onClick={() => setActiveTab('reports')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'reports'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-primary-500 dark:border-primary-400 text-primary-600 dark:text-primary-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
               }`}
             >
               Submitted Reports
@@ -96,8 +96,8 @@ export default function ReportsPage() {
             onClick={() => setActiveTab('submit')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'submit'
-                ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-500 dark:border-primary-400 text-primary-600 dark:text-primary-400'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
             }`}
           >
             Submit Report
@@ -112,16 +112,16 @@ export default function ReportsPage() {
       ) : (
         <>
       {/* Filters */}
-      <div className="card p-4 mb-6 bg-white">
+      <div className="card p-4 mb-6 bg-white dark:bg-gray-800">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Project
             </label>
             <select
               value={selectedProject}
               onChange={(e) => setSelectedProject(e.target.value)}
-              className="w-full h-9 px-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full h-9 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
             >
               <option value="all">All Projects</option>
               {projects.map((project: any) => (
@@ -132,13 +132,13 @@ export default function ReportsPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Time Range
             </label>
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
-              className="w-full h-9 px-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full h-9 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
             >
               <option value="7">Last 7 days</option>
               <option value="30">Last 30 days</option>
@@ -149,40 +149,40 @@ export default function ReportsPage() {
       </div>
 
       {dashboardLoading ? (
-        <div className="card p-12 text-center bg-white">
-          <p className="text-gray-500">Loading reports...</p>
+        <div className="card p-12 text-center bg-white dark:bg-gray-800">
+          <p className="text-gray-500 dark:text-gray-400">Loading reports...</p>
         </div>
       ) : (
         <div className="space-y-6">
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="card p-4 bg-white">
-              <div className="text-sm text-gray-600 mb-1">Total Projects</div>
-              <div className="text-2xl font-bold text-gray-900">
+            <div className="card p-4 bg-white dark:bg-gray-800">
+              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Projects</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {dashboardData?.total_projects || 0}
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {dashboardData?.active_projects || 0} active
               </div>
             </div>
-            <div className="card p-4 bg-white">
-              <div className="text-sm text-gray-600 mb-1">Total Tasks</div>
-              <div className="text-2xl font-bold text-gray-900">
+            <div className="card p-4 bg-white dark:bg-gray-800">
+              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Tasks</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {dashboardData?.total_tasks || 0}
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {dashboardData?.completed_tasks || 0} completed
               </div>
             </div>
-            <div className="card p-4 bg-white">
-              <div className="text-sm text-gray-600 mb-1">Team Members</div>
-              <div className="text-2xl font-bold text-gray-900">
+            <div className="card p-4 bg-white dark:bg-gray-800">
+              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Team Members</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {dashboardData?.team_members || 0}
               </div>
             </div>
-            <div className="card p-4 bg-white">
-              <div className="text-sm text-gray-600 mb-1">Completion Rate</div>
-              <div className="text-2xl font-bold text-gray-900">
+            <div className="card p-4 bg-white dark:bg-gray-800">
+              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Completion Rate</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {dashboardData?.total_tasks
                   ? Math.round(
                       ((dashboardData.completed_tasks || 0) / dashboardData.total_tasks) * 100
@@ -196,21 +196,22 @@ export default function ReportsPage() {
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Workload Chart */}
-            <div className="card p-6 bg-white">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Team Workload</h2>
+            <div className="card p-6 bg-white dark:bg-gray-800">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Team Workload</h2>
               {(workloadError as any)?.response?.status === 403 ? (
-                <div className="h-[300px] flex items-center justify-center text-gray-500">
+                <div className="h-[300px] flex items-center justify-center text-gray-500 dark:text-gray-400">
                   You don't have permission to view workload data
                 </div>
               ) : workloadChartData.length > 0 ? (
-                <div style={{ width: '100%', height: '300px', backgroundColor: '#fff' }}>
+                <div style={{ width: '100%', height: '300px', backgroundColor: 'transparent' }} className="dark:bg-gray-800">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={workloadChartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis dataKey="name" stroke="#6b7280" />
-                      <YAxis stroke="#6b7280" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+                      <XAxis dataKey="name" stroke="#6b7280" className="dark:stroke-gray-400" />
+                      <YAxis stroke="#6b7280" className="dark:stroke-gray-400" />
                       <Tooltip 
                         contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px' }}
+                        className="dark:!bg-gray-800 dark:!border-gray-700 dark:!text-white"
                       />
                       <Legend />
                       <Bar dataKey="tasks" fill="#3b82f6" name="Total Tasks" />
@@ -220,7 +221,7 @@ export default function ReportsPage() {
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="h-[300px] flex items-center justify-center text-gray-500 bg-white">
+                <div className="h-[300px] flex items-center justify-center text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800">
                   No workload data available
                 </div>
               )}
@@ -228,20 +229,22 @@ export default function ReportsPage() {
 
             {/* Burndown Chart */}
             {burndownData.length > 0 ? (
-              <div className="card p-6 bg-white">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Burndown Chart</h2>
-                <div style={{ width: '100%', height: '300px', backgroundColor: '#fff' }}>
+              <div className="card p-6 bg-white dark:bg-gray-800">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Burndown Chart</h2>
+                <div style={{ width: '100%', height: '300px', backgroundColor: 'transparent' }} className="dark:bg-gray-800">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={burndownData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
                       <XAxis
                         dataKey="date"
                         stroke="#6b7280"
+                        className="dark:stroke-gray-400"
                         tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       />
-                      <YAxis stroke="#6b7280" />
+                      <YAxis stroke="#6b7280" className="dark:stroke-gray-400" />
                       <Tooltip
                         contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px' }}
+                        className="dark:!bg-gray-800 dark:!border-gray-700 dark:!text-white"
                         labelFormatter={(value) => new Date(value).toLocaleDateString()}
                       />
                       <Legend />
@@ -271,9 +274,9 @@ export default function ReportsPage() {
                 </div>
               </div>
             ) : (
-              <div className="card p-6 bg-white">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Burndown Chart</h2>
-                <div className="h-[300px] flex items-center justify-center text-gray-500 bg-white">
+              <div className="card p-6 bg-white dark:bg-gray-800">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Burndown Chart</h2>
+                <div className="h-[300px] flex items-center justify-center text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800">
                   Select a project to view burndown chart
                 </div>
               </div>
@@ -281,48 +284,48 @@ export default function ReportsPage() {
           </div>
 
           {/* Workload Table */}
-          <div className="card bg-white">
-            <div className="p-4 border-b border-gray-200 bg-white">
-              <h2 className="text-lg font-semibold text-gray-900">Team Workload Details</h2>
+          <div className="card bg-white dark:bg-gray-800">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Team Workload Details</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                       Team Member
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                       Total Tasks
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                       Completed
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                       Overdue
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                       Total Hours
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                   {workloadList.length > 0 ? (
                     workloadList.map((item: any) => {
                       const totalHours = typeof item.total_hours === 'number' 
                         ? item.total_hours 
                         : Number(item.total_hours || 0);
                       return (
-                        <tr key={item.user_id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm text-gray-900">{item.user_name || 'Unknown'}</td>
-                          <td className="px-4 py-3 text-sm text-gray-600">{item.task_count || 0}</td>
-                          <td className="px-4 py-3 text-sm text-green-600">
+                        <tr key={item.user_id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                          <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{item.user_name || 'Unknown'}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{item.task_count || 0}</td>
+                          <td className="px-4 py-3 text-sm text-green-600 dark:text-green-400">
                             {item.completed_task_count || 0}
                           </td>
-                          <td className="px-4 py-3 text-sm text-red-600">
+                          <td className="px-4 py-3 text-sm text-red-600 dark:text-red-400">
                             {item.overdue_task_count || 0}
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-600">
+                          <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
                             {totalHours.toFixed(1)}h
                           </td>
                         </tr>
@@ -330,7 +333,7 @@ export default function ReportsPage() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500">
+                      <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                         {(workloadError as any)?.response?.status === 403 
                           ? 'You don\'t have permission to view workload data'
                           : 'No workload data available'}
