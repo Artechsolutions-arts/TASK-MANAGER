@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
-import { Eye, EyeOff, Sun, Moon } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import loginLogo from '../assets/LOGOFA.png';
 import loginRightImage from '../assets/LogoF.png';
 
@@ -14,7 +13,6 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
-  const { resolvedTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,22 +43,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen h-screen flex bg-white dark:bg-gray-900 overflow-hidden min-w-0">
-      {/* Theme indicator - visible on every screen */}
-      <button
-        type="button"
-        onClick={toggleTheme}
-        title={`Theme: ${resolvedTheme}. Click to switch.`}
-        className={`fixed top-4 right-4 z-50 flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium border transition-colors ${
-          resolvedTheme === 'dark'
-            ? 'bg-gray-800 text-gray-100 border-gray-600 hover:bg-gray-700'
-            : 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200'
-        }`}
-        aria-label={`Theme: ${resolvedTheme}. Click to toggle.`}
-      >
-        {resolvedTheme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-        <span>{resolvedTheme === 'dark' ? 'Dark' : 'Light'}</span>
-      </button>
-
       {/* Left Side - Login Form: scrollable when content overflows (short/tall screens) */}
       <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-y-auto">
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 bg-white dark:bg-gray-900">

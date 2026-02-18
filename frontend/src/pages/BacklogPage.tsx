@@ -105,8 +105,8 @@ export default function BacklogPage() {
   return (
     <div className="px-6 py-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Backlog</h1>
-        <p className="text-gray-500">View and manage your backlog items</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Backlog</h1>
+        <p className="text-gray-500 dark:text-gray-400">View and manage your backlog items</p>
       </div>
 
       {/* Filters */}
@@ -114,13 +114,13 @@ export default function BacklogPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Project Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Project
             </label>
             <select
               value={selectedProject}
               onChange={(e) => setSelectedProject(e.target.value)}
-              className="w-full h-9 px-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full h-9 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
             >
               <option value="all">All Projects</option>
               {projects.map((project: Project) => (
@@ -133,13 +133,13 @@ export default function BacklogPage() {
 
           {/* Status Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Status
             </label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full h-9 px-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full h-9 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
             >
               <option value="all">All Status</option>
               <option value="Backlog">Backlog</option>
@@ -151,13 +151,13 @@ export default function BacklogPage() {
 
           {/* Priority Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Priority
             </label>
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="w-full h-9 px-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full h-9 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
             >
               <option value="all">All Priorities</option>
               <option value="Critical">Critical</option>
@@ -169,7 +169,7 @@ export default function BacklogPage() {
 
           {/* Search */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Search
             </label>
             <input
@@ -177,7 +177,7 @@ export default function BacklogPage() {
               placeholder="Search tasks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-9 px-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full h-9 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
             />
           </div>
         </div>
@@ -186,11 +186,11 @@ export default function BacklogPage() {
       {/* Tasks List */}
       {tasksLoading ? (
         <div className="card p-12 text-center">
-          <p className="text-gray-500">Loading backlog items...</p>
+          <p className="text-gray-500 dark:text-gray-400">Loading backlog items...</p>
         </div>
       ) : filteredTasks.length === 0 ? (
         <div className="card p-12 text-center">
-          <p className="text-gray-500">No backlog items found</p>
+          <p className="text-gray-500 dark:text-gray-400">No backlog items found</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -198,20 +198,20 @@ export default function BacklogPage() {
             if (statusTasks.length === 0) return null;
             return (
               <div key={status} className="card">
-                <div className="p-4 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900">
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {status} ({statusTasks.length})
                   </h2>
                 </div>
-                <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-gray-200 dark:divide-gray-700">
                   {statusTasks.map((task: Task) => {
                     const project = projects.find((p: Project) => p.id === task.project_id);
                     return (
-                      <div key={task.id} className="p-4 hover:bg-gray-50 transition-colors">
+                      <div key={task.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-2">
-                              <span className="text-sm font-medium text-gray-900">
+                              <span className="text-sm font-medium text-gray-900 dark:text-white">
                                 {task.title}
                               </span>
                               <span
@@ -230,11 +230,11 @@ export default function BacklogPage() {
                               </span>
                             </div>
                             {task.description && (
-                              <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">
                                 {task.description}
                               </p>
                             )}
-                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                            <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                               {project && (
                                 <span className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                                   <FolderKanban className="w-3.5 h-3.5" />
@@ -265,7 +265,7 @@ export default function BacklogPage() {
                                     sprintId: e.target.value || null,
                                   });
                                 }}
-                                className="text-xs border border-gray-300 rounded px-2 py-1"
+                                className="text-xs border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <option value="">No Sprint</option>

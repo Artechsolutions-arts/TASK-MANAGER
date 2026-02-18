@@ -144,7 +144,7 @@ export default function CreateProjectPage() {
             </div>
 
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Project Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -159,7 +159,7 @@ export default function CreateProjectPage() {
             </div>
 
             <div>
-              <label htmlFor="work_type" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="work_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 What are we building? <span className="text-red-500">*</span>
               </label>
               <input

@@ -184,15 +184,15 @@ export default function CreateTaskPage() {
           >
             ← Back to Tasks
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">Create New Task</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Create New Task</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {isTeamLead 
               ? 'Create a task for a project assigned to your team'
               : 'Fill in the details to create a new task'}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="card p-6 bg-white">
+        <form onSubmit={handleSubmit} className="card p-6 bg-white dark:bg-gray-800">
           {error && (
             <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
               <p className="text-sm text-red-800">{error}</p>
@@ -201,7 +201,7 @@ export default function CreateTaskPage() {
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="project_id" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="project_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Project <span className="text-red-500">*</span>
               </label>
               <select
@@ -213,7 +213,7 @@ export default function CreateTaskPage() {
                   setError(''); // Clear any previous errors
                 }}
                 required
-                className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
               >
                 <option value="">Select a project</option>
                 {availableProjects.map((project: any) => (
@@ -223,7 +223,7 @@ export default function CreateTaskPage() {
                 ))}
               </select>
               {isTeamLead && availableProjects.length === 0 && (
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   No projects available. Projects must be assigned to your team.
                 </p>
               )}
@@ -231,7 +231,7 @@ export default function CreateTaskPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Project/category
                 </label>
                 <input
@@ -239,13 +239,13 @@ export default function CreateTaskPage() {
                   id="category"
                   value={(formData as any).category || ''}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value } as any)}
-                  className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                   placeholder="e.g., Marketing, App Development"
                 />
               </div>
 
               <div>
-                <label htmlFor="labels" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="labels" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Labels
                 </label>
                 <input
@@ -253,15 +253,15 @@ export default function CreateTaskPage() {
                   id="labels"
                   value={labelsText}
                   onChange={(e) => setLabelsText(e.target.value)}
-                  className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                   placeholder="e.g., urgent, client"
                 />
-                <p className="mt-1 text-xs text-gray-500">Comma-separated</p>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Comma-separated</p>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Attachments
               </label>
               <input
@@ -299,8 +299,8 @@ export default function CreateTaskPage() {
                   {attachments.map((a, idx) => (
                     <div key={`${a.file_name}-${idx}`} className="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2">
                       <div className="min-w-0">
-                        <div className="text-sm font-medium text-gray-900 truncate">{a.file_name}</div>
-                        <div className="text-xs text-gray-500">{Math.round(a.file_size / 1024)} KB</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{a.file_name}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{Math.round(a.file_size / 1024)} KB</div>
                       </div>
                       <button
                         type="button"
@@ -317,7 +317,7 @@ export default function CreateTaskPage() {
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Task Title <span className="text-red-500">*</span>
                 </label>
                 {formData.title?.trim() && formData.project_id && (
@@ -346,7 +346,7 @@ export default function CreateTaskPage() {
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                 placeholder="Enter task title"
                 required
               />
@@ -385,7 +385,7 @@ export default function CreateTaskPage() {
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Description
               </label>
               <textarea
@@ -393,13 +393,13 @@ export default function CreateTaskPage() {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                 placeholder="Enter task description"
               />
             </div>
 
             <div>
-              <label htmlFor="assignee_id" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="assignee_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Assign To
               </label>
               <select
@@ -407,7 +407,7 @@ export default function CreateTaskPage() {
                 value={formData.assignee_id}
                 onChange={(e) => setFormData({ ...formData, assignee_id: e.target.value })}
                 disabled={!formData.project_id || teamMembers.length === 0}
-                className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
               >
                 <option value="">Select a team member</option>
                 {teamMembers.map((member: any) => (
@@ -417,12 +417,12 @@ export default function CreateTaskPage() {
                 ))}
               </select>
               {!formData.project_id && (
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   Please select a project first to see team members
                 </p>
               )}
               {formData.project_id && teamMembers.length === 0 && (
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   No team members found for this project
                 </p>
               )}
@@ -430,14 +430,14 @@ export default function CreateTaskPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Status
                 </label>
                 <select
                   id="status"
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                 >
                   <option value="To Do">To Do</option>
                   <option value="In Progress">In Progress</option>
@@ -448,14 +448,14 @@ export default function CreateTaskPage() {
               </div>
 
               <div>
-                <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="priority" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Priority
                 </label>
                 <select
                   id="priority"
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                  className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                 >
                   <option value="Low">Low</option>
                   <option value="Medium">Medium</option>
@@ -467,7 +467,7 @@ export default function CreateTaskPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="story_points" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="story_points" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Story Points
                 </label>
                 <input
@@ -477,7 +477,7 @@ export default function CreateTaskPage() {
                   step="1"
                   value={formData.story_points || ''}
                   onChange={(e) => setFormData({ ...formData, story_points: e.target.value ? Number(e.target.value) : undefined })}
-                  className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                   placeholder="0"
                 />
               </div>
@@ -485,7 +485,7 @@ export default function CreateTaskPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="due_date" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="due_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Due Date
                 </label>
                 <input
@@ -493,12 +493,12 @@ export default function CreateTaskPage() {
                   id="due_date"
                   value={formData.due_date}
                   onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                  className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                 />
               </div>
 
               <div>
-                <label htmlFor="estimated_hours" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="estimated_hours" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Estimated Hours
                 </label>
                 <input
@@ -508,7 +508,7 @@ export default function CreateTaskPage() {
                   step="0.5"
                   value={formData.estimated_hours || ''}
                   onChange={(e) => setFormData({ ...formData, estimated_hours: e.target.value ? Number(e.target.value) : undefined })}
-                  className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                   placeholder="0"
                 />
               </div>
