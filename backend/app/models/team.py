@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from pydantic import Field
 import uuid
@@ -12,6 +12,10 @@ class Team(BaseModel, SoftDeleteMixin):
     description: Optional[str] = Field(None, max_length=5000)
     organization_id: uuid.UUID
     team_lead_id: uuid.UUID
+    privacy: str = Field(default="private", max_length=20)  # private, public
+    tags: List[str] = Field(default_factory=list)
+    default_task_status: str = Field(default="To Do", max_length=50)
+    default_task_priority: str = Field(default="Medium", max_length=20)
     
     class Settings:
         name = "teams"
@@ -27,6 +31,7 @@ class TeamMember(BaseModel):
     
     team_id: uuid.UUID
     user_id: uuid.UUID
+    role: str = Field(default="Member", max_length=50)  # Owner, Admin, Member
     joined_at: datetime = Field(default_factory=datetime.utcnow)
     left_at: Optional[datetime] = None
     

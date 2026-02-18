@@ -10,7 +10,8 @@ export default function EditProjectPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { canCreateProject } = useUserRole();
+  const { canCreateProject, isCEO, isManager } = useUserRole();
+  const canSeeBudget = isCEO || isManager;
 
   // Redirect if user doesn't have permission
   useEffect(() => {
@@ -41,12 +42,19 @@ export default function EditProjectPage() {
 
   const [formData, setFormData] = useState({
     name: '',
+    company_name: '',
+    summary: '',
     description: '',
     work_type: '',
+    category: '',
     status: 'Planning',
     start_date: '',
     end_date: '',
     team_ids: [] as string[],
+    labels_text: '',
+    url: '',
+    budget: '' as string,
+    attachments: [] as Array<{ file_name: string; file_type: string; file_data: string; file_size: number }>,
   });
   const [error, setError] = useState('');
 
@@ -66,15 +74,22 @@ export default function EditProjectPage() {
 
       setFormData({
         name: project.name || '',
+        company_name: (project as any).company_name || '',
+        summary: (project as any).summary || '',
         description: project.description || '',
         work_type: project.work_type || '',
+        category: (project as any).category || '',
         status: project.status || 'Planning',
         start_date: formatDateForInput(project.start_date),
         end_date: formatDateForInput(project.end_date),
         team_ids: currentTeamIds.length > 0 ? currentTeamIds : [],
+        labels_text: Array.isArray((project as any).labels) ? (project as any).labels.join(', ') : '',
+        url: (project as any).url || '',
+        budget: canSeeBudget && (project as any).budget != null ? String((project as any).budget) : '',
+        attachments: [],
       });
     }
-  }, [project, currentTeamIds]);
+  }, [project, currentTeamIds, canSeeBudget]);
 
   const updateMutation = useMutation({
     mutationFn: (data: any) => projectsAPI.update(id!, data),
@@ -97,14 +112,25 @@ export default function EditProjectPage() {
       return;
     }
 
+    const labels = (formData.labels_text || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
     const projectData = {
       name: formData.name,
+      company_name: formData.company_name || undefined,
+      summary: formData.summary || undefined,
       description: formData.description,
       work_type: formData.work_type || undefined,
+      category: formData.category || undefined,
       status: formData.status,
       start_date: formData.start_date || undefined,
       end_date: formData.end_date || undefined,
       team_ids: formData.team_ids.length > 0 ? formData.team_ids : undefined,
+      labels: labels.length > 0 ? labels : undefined,
+      url: formData.url || undefined,
+      budget: canSeeBudget && formData.budget !== '' ? Number(formData.budget) : undefined,
+      attachments: formData.attachments.length > 0 ? formData.attachments : undefined,
     };
 
     updateMutation.mutate(projectData);
@@ -158,6 +184,32 @@ export default function EditProjectPage() {
           )}
 
           <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Company name
+                </label>
+                <input
+                  type="text"
+                  id="company_name"
+                  value={formData.company_name}
+                  onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Project category/type
+                </label>
+                <input
+                  type="text"
+                  id="category"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Project Name <span className="text-red-500">*</span>
@@ -323,6 +375,157 @@ export default function EditProjectPage() {
               >
                 {updateMutation.isPending ? 'Updating...' : 'Update Project'}
               </button>
+            </div>
+
+            <div>
+              <label htmlFor="summary" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Summary
+              </label>
+              <textarea
+                id="summary"
+                value={formData.summary}
+                onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="labels_text" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Labels
+                </label>
+                <input
+                  type="text"
+                  id="labels_text"
+                  value={formData.labels_text}
+                  onChange={(e) => setFormData({ ...formData, labels_text: e.target.value })}
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="e.g., urgent, client"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Comma-separated</p>
+              </div>
+              <div>
+                <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  URL
+                </label>
+                <input
+                  type="url"
+                  id="url"
+                  value={formData.url}
+                  onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+
+            {canSeeBudget && (
+              <div>
+                <label htmlFor="budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Budget
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  id="budget"
+                  value={formData.budget}
+                  onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Visible only to CEO and Manager.</p>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Attachments
+              </label>
+              <input
+                type="file"
+                multiple
+                onChange={async (e) => {
+                  const files = Array.from(e.target.files || []);
+                  if (files.length === 0) return;
+                  try {
+                    const toBase64 = (file: File) =>
+                      new Promise<string>((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                      });
+
+                    const newAttachments = await Promise.all(
+                      files.map(async (f) => ({
+                        file_name: f.name,
+                        file_type: f.type || 'application/octet-stream',
+                        file_data: await toBase64(f),
+                        file_size: f.size,
+                      }))
+                    );
+                    setFormData((prev) => ({ ...prev, attachments: [...prev.attachments, ...newAttachments] }));
+                    e.currentTarget.value = '';
+                  } catch {
+                    setError('Failed to read attachment(s)');
+                  }
+                }}
+                className="block w-full text-sm text-gray-700 dark:text-gray-200 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-600 file:text-white hover:file:bg-primary-700"
+              />
+
+              {Array.isArray((project as any)?.attachments) && (project as any).attachments.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {(project as any).attachments.map((a: any) => (
+                    <div key={a.id} className="flex items-center justify-between rounded-md border border-gray-200 dark:border-gray-700 px-3 py-2">
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{a.file_name}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{Math.round((a.file_size || 0) / 1024)} KB</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            await projectsAPI.removeAttachment(id!, a.id);
+                            queryClient.invalidateQueries({ queryKey: ['project', id] });
+                            queryClient.invalidateQueries({ queryKey: ['projects'] });
+                          } catch (err: any) {
+                            setError(err?.response?.data?.detail || 'Failed to remove attachment');
+                          }
+                        }}
+                        className="text-sm text-red-600 hover:text-red-700 dark:text-red-400"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {formData.attachments.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">To be added</div>
+                  {formData.attachments.map((a, idx) => (
+                    <div key={`${a.file_name}-${idx}`} className="flex items-center justify-between rounded-md border border-gray-200 dark:border-gray-700 px-3 py-2">
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{a.file_name}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{Math.round(a.file_size / 1024)} KB</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            attachments: prev.attachments.filter((_, i) => i !== idx),
+                          }))
+                        }
+                        className="text-sm text-red-600 hover:text-red-700 dark:text-red-400"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </form>

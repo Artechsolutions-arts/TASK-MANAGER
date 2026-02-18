@@ -21,9 +21,26 @@ async def create_team(
         name=team_data.name,
         description=team_data.description,
         organization_id=current_user.organization_id,
-        team_lead_id=team_data.team_lead_id
+        team_lead_id=team_data.team_lead_id,
+        privacy=team_data.privacy or "private",
+        tags=team_data.tags or [],
+        default_task_status=team_data.default_task_status or "To Do",
+        default_task_priority=team_data.default_task_priority or "Medium",
     )
     await team.insert()
+
+    # Ensure team lead is a member (Owner)
+    lead_member = await TeamMember.find_one(
+        TeamMember.team_id == team.id,
+        TeamMember.user_id == team_data.team_lead_id,
+        TeamMember.left_at == None
+    )
+    if not lead_member:
+        await TeamMember(
+            team_id=team.id,
+            user_id=team_data.team_lead_id,
+            role="Owner"
+        ).insert()
     
     audit_service = AuditService()
     await audit_service.log_action(
@@ -184,7 +201,8 @@ async def add_team_member(
     
     member = TeamMember(
         team_id=uuid.UUID(team_id),
-        user_id=member_data.user_id
+        user_id=member_data.user_id,
+        role=member_data.role or "Member",
     )
     await member.insert()
     
@@ -196,6 +214,45 @@ async def add_team_member(
         user_id=str(current_user.id)
     )
     
+    return member
+
+
+@router.put("/{team_id}/members/{user_id}/role", response_model=TeamMemberResponse)
+async def update_team_member_role(
+    team_id: str,
+    user_id: str,
+    data: dict,
+    current_user: User = Depends(require_permission("team", "update"))
+):
+    """Update a team member role"""
+    team = await Team.find_one(
+        Team.id == uuid.UUID(team_id),
+        Team.organization_id == current_user.organization_id,
+        Team.deleted_at == None
+    )
+    if not team:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Team not found")
+
+    try:
+        user_uuid = uuid.UUID(user_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid user ID")
+
+    role = (data or {}).get("role")
+    if not role or not isinstance(role, str):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Role is required")
+
+    member = await TeamMember.find_one(
+        TeamMember.team_id == uuid.UUID(team_id),
+        TeamMember.user_id == user_uuid,
+        TeamMember.left_at == None
+    )
+    if not member:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Member not found in team")
+
+    member.role = role
+    member.update_timestamp()
+    await member.save()
     return member
 
 

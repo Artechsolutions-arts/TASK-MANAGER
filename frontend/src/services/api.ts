@@ -151,6 +151,19 @@ export const projectsAPI = {
     const response = await api.get(`/projects/${projectId}/teams`);
     return response.data;
   },
+
+  addAttachment: async (
+    projectId: string,
+    attachment: { file_name: string; file_type: string; file_data: string; file_size: number }
+  ): Promise<Project> => {
+    const response = await api.post(`/projects/${projectId}/attachments`, attachment);
+    return response.data;
+  },
+
+  removeAttachment: async (projectId: string, attachmentId: string): Promise<Project> => {
+    const response = await api.delete(`/projects/${projectId}/attachments/${attachmentId}`);
+    return response.data;
+  },
 };
 
 // Tasks API
@@ -160,6 +173,9 @@ export const tasksAPI = {
     story_id?: string;
     status?: string;
     assignee_id?: string;
+    reporter_id?: string;
+    open_only?: boolean;
+    sort?: 'created_desc' | 'created_asc' | 'updated_desc' | 'updated_asc';
     skip?: number;
     limit?: number;
   }): Promise<Task[]> => {
@@ -185,6 +201,19 @@ export const tasksAPI = {
   
   delete: async (id: string): Promise<void> => {
     await api.delete(`/tasks/${id}`);
+  },
+
+  addAttachment: async (
+    taskId: string,
+    attachment: { file_name: string; file_type: string; file_data: string; file_size: number }
+  ): Promise<Task> => {
+    const response = await api.post(`/tasks/${taskId}/attachments`, attachment);
+    return response.data;
+  },
+
+  removeAttachment: async (taskId: string, attachmentId: string): Promise<Task> => {
+    const response = await api.delete(`/tasks/${taskId}/attachments/${attachmentId}`);
+    return response.data;
   },
 };
 
@@ -274,6 +303,10 @@ export const teamsAPI = {
   
   removeMember: async (teamId: string, userId: string): Promise<void> => {
     await api.delete(`/teams/${teamId}/members/${userId}`);
+  },
+
+  updateMemberRole: async (teamId: string, userId: string, role: string): Promise<void> => {
+    await api.put(`/teams/${teamId}/members/${userId}/role`, { role });
   },
 };
 

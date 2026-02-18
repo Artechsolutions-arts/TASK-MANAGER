@@ -1,10 +1,11 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import date, datetime
 from decimal import Decimal
 from pydantic import Field, field_validator
 from bson.decimal128 import Decimal128
 import uuid
 from app.models.base import BaseModel, SoftDeleteMixin
+from app.models.attachment import Attachment
 
 
 class Epic(BaseModel, SoftDeleteMixin):
@@ -71,6 +72,7 @@ class Task(BaseModel, SoftDeleteMixin):
     
     title: str = Field(..., max_length=255)
     description: Optional[str] = Field(None, max_length=5000)
+    category: Optional[str] = Field(None, max_length=255)
     story_id: Optional[uuid.UUID] = None
     project_id: uuid.UUID
     sprint_id: Optional[uuid.UUID] = None  # Optional sprint assignment
@@ -82,6 +84,8 @@ class Task(BaseModel, SoftDeleteMixin):
     estimated_hours: Optional[Decimal] = None
     position: int = Field(default=0)  # For Kanban ordering
     story_points: Optional[Decimal] = Field(None)  # Story points for sprint planning
+    labels: List[str] = Field(default_factory=list)
+    attachments: List[Attachment] = Field(default_factory=list)
     
     @field_validator('estimated_hours', mode='before')
     @classmethod

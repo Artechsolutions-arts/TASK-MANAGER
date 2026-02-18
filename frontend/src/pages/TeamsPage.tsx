@@ -4,6 +4,9 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { teamsAPI, usersAPI } from '../services/api';
 import { useUserRole } from '../utils/permissions';
 import type { User } from '../types';
+import { Star } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { isStarred, toggleStarred } from '../utils/prefs';
 
 export default function TeamsPage() {
   const queryClient = useQueryClient();
@@ -11,12 +14,18 @@ export default function TeamsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { isCEO, isManager } = useUserRole();
   const canManageTeams = isCEO || isManager;
+  const { user } = useAuth();
+  const [starTick, setStarTick] = useState(0);
 
   const [isCreateOpen, setIsCreateOpen] = useState(searchParams.get('create') === 'true');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [teamLeadId, setTeamLeadId] = useState('');
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([]);
+  const [privacy, setPrivacy] = useState<'private' | 'public'>('private');
+  const [tagsText, setTagsText] = useState('');
+  const [defaultTaskStatus, setDefaultTaskStatus] = useState('To Do');
+  const [defaultTaskPriority, setDefaultTaskPriority] = useState('Medium');
   const [formError, setFormError] = useState('');
 
   const { data: teams, isLoading, error } = useQuery({
@@ -47,6 +56,13 @@ export default function TeamsPage() {
         name: name.trim(),
         description: description.trim() || undefined,
         team_lead_id: teamLeadId,
+        privacy,
+        tags: tagsText
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean),
+        default_task_status: defaultTaskStatus,
+        default_task_priority: defaultTaskPriority,
       } as any);
 
       // Add members (optional)
@@ -64,6 +80,10 @@ export default function TeamsPage() {
       setDescription('');
       setTeamLeadId('');
       setSelectedMemberIds([]);
+      setPrivacy('private');
+      setTagsText('');
+      setDefaultTaskStatus('To Do');
+      setDefaultTaskPriority('Medium');
       setFormError('');
     },
     onError: (err: any) => {
@@ -161,6 +181,60 @@ export default function TeamsPage() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Privacy settings</label>
+                  <select
+                    value={privacy}
+                    onChange={(e) => setPrivacy(e.target.value as any)}
+                    className="w-full h-10 px-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="private">Private</option>
+                    <option value="public">Public</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tags/categories</label>
+                  <input
+                    value={tagsText}
+                    onChange={(e) => setTagsText(e.target.value)}
+                    className="w-full h-10 px-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    placeholder="e.g., frontend, marketing"
+                  />
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Comma-separated</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Default task settings (status)</label>
+                  <select
+                    value={defaultTaskStatus}
+                    onChange={(e) => setDefaultTaskStatus(e.target.value)}
+                    className="w-full h-10 px-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="Backlog">Backlog</option>
+                    <option value="To Do">To Do</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Review">Review</option>
+                    <option value="Done">Done</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Default task settings (priority)</label>
+                  <select
+                    value={defaultTaskPriority}
+                    onChange={(e) => setDefaultTaskPriority(e.target.value)}
+                    className="w-full h-10 px-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description (optional)</label>
                 <textarea
@@ -235,7 +309,26 @@ export default function TeamsPage() {
               onClick={() => navigate(`/teams/${team.id}`)}
               className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 cursor-pointer"
             >
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{team.name}</h3>
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{team.name}</h3>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleStarred('team', user?.id, { id: team.id, label: team.name, path: `/teams/${team.id}` });
+                    setStarTick((x) => x + 1);
+                  }}
+                  className={`p-1 rounded-md transition-colors ${
+                    isStarred('team', user?.id, team.id)
+                      ? 'text-yellow-500 hover:text-yellow-600'
+                      : 'text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400'
+                  }`}
+                  title={isStarred('team', user?.id, team.id) ? 'Starred' : 'Star'}
+                  aria-label={isStarred('team', user?.id, team.id) ? 'Unstar team' : 'Star team'}
+                >
+                  <Star className={`w-5 h-5 ${isStarred('team', user?.id, team.id) ? 'fill-current' : ''}`} />
+                </button>
+              </div>
               {team.description && (
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{team.description}</p>
               )}

@@ -9,7 +9,8 @@ export default function CreateProjectPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { canCreateProject } = useUserRole();
+  const { canCreateProject, isCEO, isManager } = useUserRole();
+  const canSeeBudget = isCEO || isManager;
 
   // Redirect if user doesn't have permission
   useEffect(() => {
@@ -19,12 +20,19 @@ export default function CreateProjectPage() {
   }, [canCreateProject, navigate]);
   const [formData, setFormData] = useState({
     name: '',
+    company_name: '',
+    summary: '',
     description: '',
     work_type: '',
+    category: '',
     status: 'Planning',
     start_date: '',
     end_date: '',
     team_ids: [] as string[],
+    labels_text: '',
+    url: '',
+    budget: '' as string,
+    attachments: [] as Array<{ file_name: string; file_type: string; file_data: string; file_size: number }>,
   });
   const [error, setError] = useState('');
 
@@ -54,16 +62,28 @@ export default function CreateProjectPage() {
       return;
     }
 
+    const labels = (formData.labels_text || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
     const projectData = {
       name: formData.name,
+      company_name: formData.company_name || undefined,
+      summary: formData.summary || undefined,
       description: formData.description,
       work_type: formData.work_type || undefined,
+      category: formData.category || undefined,
       status: formData.status,
       start_date: formData.start_date || undefined,
       end_date: formData.end_date || undefined,
       manager_id: user?.id,
+      reported_by_id: user?.id,
       team_ids: formData.team_ids.length > 0 ? formData.team_ids : undefined,
       progress_percentage: 0,
+      labels: labels.length > 0 ? labels : undefined,
+      url: formData.url || undefined,
+      budget: canSeeBudget && formData.budget !== '' ? Number(formData.budget) : undefined,
+      attachments: formData.attachments.length > 0 ? formData.attachments : undefined,
     };
 
     createMutation.mutate(projectData);
@@ -85,7 +105,7 @@ export default function CreateProjectPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="card p-6 bg-white">
+        <form onSubmit={handleSubmit} className="card p-6 bg-white dark:bg-gray-800">
           {error && (
             <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
               <p className="text-sm text-red-800">{error}</p>
@@ -93,6 +113,36 @@ export default function CreateProjectPage() {
           )}
 
           <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Company name
+                </label>
+                <input
+                  type="text"
+                  id="company_name"
+                  value={formData.company_name}
+                  onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="e.g., Artech Solutions"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Project category/type
+                </label>
+                <input
+                  type="text"
+                  id="category"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="e.g., Marketing, App Development"
+                />
+              </div>
+            </div>
+
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                 Project Name <span className="text-red-500">*</span>
@@ -102,7 +152,7 @@ export default function CreateProjectPage() {
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Enter project name"
                 required
               />
@@ -117,7 +167,7 @@ export default function CreateProjectPage() {
                 id="work_type"
                 value={formData.work_type}
                 onChange={(e) => setFormData({ ...formData, work_type: e.target.value })}
-                className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="e.g., App Development, Website, Marketing, Internal Tool"
                 required
                 list="work-type-suggestions"
@@ -138,7 +188,21 @@ export default function CreateProjectPage() {
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="summary" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Summary
+              </label>
+              <textarea
+                id="summary"
+                value={formData.summary}
+                onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="Short summary (1–2 lines)"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Description
               </label>
               <textarea
@@ -146,20 +210,20 @@ export default function CreateProjectPage() {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Enter project description"
               />
             </div>
 
             <div>
-              <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Status
               </label>
               <select
                 id="status"
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="Planning">Planning</option>
                 <option value="In Progress">In Progress</option>
@@ -170,13 +234,13 @@ export default function CreateProjectPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Assign Teams
               </label>
               {teams.length === 0 ? (
                 <p className="text-sm text-gray-500 py-2">No teams available. Create teams first.</p>
               ) : (
-                <div className="border border-gray-300 rounded-md p-3 max-h-48 overflow-y-auto">
+                <div className="border border-gray-300 dark:border-gray-600 rounded-md p-3 max-h-48 overflow-y-auto bg-white dark:bg-gray-700">
                   {teams.map((team) => (
                     <label
                       key={team.id}
@@ -200,9 +264,9 @@ export default function CreateProjectPage() {
                         }}
                         className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                       />
-                      <span className="ml-3 text-sm text-gray-700">{team.name}</span>
+                      <span className="ml-3 text-sm text-gray-700 dark:text-gray-200">{team.name}</span>
                       {team.description && (
-                        <span className="ml-2 text-xs text-gray-500">- {team.description}</span>
+                        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">- {team.description}</span>
                       )}
                     </label>
                   ))}
@@ -217,7 +281,7 @@ export default function CreateProjectPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Start Date
                 </label>
                 <input
@@ -225,12 +289,12 @@ export default function CreateProjectPage() {
                   id="start_date"
                   value={formData.start_date}
                   onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                  className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label htmlFor="end_date" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="end_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   End Date
                 </label>
                 <input
@@ -238,9 +302,120 @@ export default function CreateProjectPage() {
                   id="end_date"
                   value={formData.end_date}
                   onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                  className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="labels_text" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Labels
+                </label>
+                <input
+                  type="text"
+                  id="labels_text"
+                  value={formData.labels_text}
+                  onChange={(e) => setFormData({ ...formData, labels_text: e.target.value })}
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="e.g., urgent, client, v1"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Comma-separated</p>
+              </div>
+
+              <div>
+                <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  URL
+                </label>
+                <input
+                  type="url"
+                  id="url"
+                  value={formData.url}
+                  onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+
+            {canSeeBudget && (
+              <div>
+                <label htmlFor="budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Budget
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  id="budget"
+                  value={formData.budget}
+                  onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="0.00"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Visible only to CEO and Manager.</p>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Attachments
+              </label>
+              <input
+                type="file"
+                multiple
+                onChange={async (e) => {
+                  const files = Array.from(e.target.files || []);
+                  if (files.length === 0) return;
+                  try {
+                    const toBase64 = (file: File) =>
+                      new Promise<string>((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                      });
+
+                    const newAttachments = await Promise.all(
+                      files.map(async (f) => ({
+                        file_name: f.name,
+                        file_type: f.type || 'application/octet-stream',
+                        file_data: await toBase64(f),
+                        file_size: f.size,
+                      }))
+                    );
+                    setFormData((prev) => ({ ...prev, attachments: [...prev.attachments, ...newAttachments] }));
+                    e.currentTarget.value = '';
+                  } catch {
+                    setError('Failed to read attachment(s)');
+                  }
+                }}
+                className="block w-full text-sm text-gray-700 dark:text-gray-200 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-600 file:text-white hover:file:bg-primary-700"
+              />
+              {formData.attachments.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {formData.attachments.map((a, idx) => (
+                    <div key={`${a.file_name}-${idx}`} className="flex items-center justify-between rounded-md border border-gray-200 dark:border-gray-700 px-3 py-2">
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{a.file_name}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{Math.round(a.file_size / 1024)} KB</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            attachments: prev.attachments.filter((_, i) => i !== idx),
+                          }))
+                        }
+                        className="text-sm text-red-600 hover:text-red-700 dark:text-red-400"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-3 pt-4">

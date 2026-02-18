@@ -9,7 +9,8 @@ from app.schemas.task import (
     EpicCreate, EpicUpdate, EpicResponse,
     StoryCreate, StoryUpdate, StoryResponse,
     TaskCreate, TaskUpdate, TaskResponse,
-    SubtaskCreate, SubtaskUpdate, SubtaskResponse
+    SubtaskCreate, SubtaskUpdate, SubtaskResponse,
+    AttachmentCreate
 )
 from app.services.audit_service import AuditService
 from app.services.permission_service import PermissionService
@@ -256,6 +257,7 @@ async def create_task(
     current_user: User = Depends(require_permission("task", "create"))
 ):
     """Create a new task"""
+    from app.models.attachment import Attachment
     # Verify project exists
     project = await Project.find_one(
         Project.id == task_data.project_id,
@@ -325,6 +327,7 @@ async def create_task(
     task = Task(
         title=task_data.title,
         description=task_data.description,
+        category=task_data.category,
         project_id=task_data.project_id,
         story_id=task_data.story_id,
         sprint_id=task_data.sprint_id,
@@ -335,7 +338,18 @@ async def create_task(
         due_date=due_date_dt,
         estimated_hours=task_data.estimated_hours,
         story_points=story_points_decimal,
-        position=task_data.position or (max_position + 1)
+        position=task_data.position or (max_position + 1),
+        labels=task_data.labels or [],
+        attachments=[
+            Attachment(
+                file_name=a.file_name,
+                file_type=a.file_type,
+                file_data=a.file_data,
+                file_size=a.file_size,
+                uploaded_by=current_user.id,
+            )
+            for a in (task_data.attachments or [])
+        ],
     )
     await task.insert()
     
@@ -367,6 +381,9 @@ async def list_tasks(
     story_id: Optional[str] = Query(None),
     status: Optional[str] = Query(None),
     assignee_id: Optional[str] = Query(None),
+    reporter_id: Optional[str] = Query(None),
+    open_only: Optional[bool] = Query(False),
+    sort: Optional[str] = Query(None, description="created_desc|created_asc|updated_desc|updated_asc"),
     skip: int = Query(0, ge=0),
     limit: int = Query(500, ge=1, le=500),
     current_user: User = Depends(require_permission("task", "read"))
@@ -453,11 +470,29 @@ async def list_tasks(
         task_query = task_query.find(Task.status == status)
     if assignee_id:
         task_query = task_query.find(Task.assignee_id == uuid.UUID(assignee_id))
+    if reporter_id:
+        task_query = task_query.find(Task.reporter_id == uuid.UUID(reporter_id))
+    if open_only:
+        task_query = task_query.find(Task.status != "Done")
 
-    tasks = await task_query.sort(
-        [("position", 1), ("created_at", -1)]
-    ).skip(skip).limit(limit).to_list()
-    return tasks
+    if sort == "created_asc":
+        task_query = task_query.sort(+Task.created_at)
+    elif sort == "updated_desc":
+        task_query = task_query.sort(-Task.updated_at)
+    elif sort == "updated_asc":
+        task_query = task_query.sort(+Task.updated_at)
+    else:  # default created_desc
+        task_query = task_query.sort(-Task.created_at)
+
+    tasks = await task_query.skip(skip).limit(limit).to_list()
+
+    # Avoid sending inline base64 attachments in list views (fetch via GET /tasks/{id})
+    items = []
+    for t in tasks:
+        d = t.dict()
+        d["attachments"] = []
+        items.append(d)
+    return items
 
 
 @router.get("/{task_id}", response_model=TaskResponse)
@@ -500,6 +535,7 @@ async def update_task(
     current_user: User = Depends(require_permission("task", "update"))
 ):
     """Update task"""
+    from app.models.attachment import Attachment
     task = await Task.find_one(
         Task.id == uuid.UUID(task_id),
         Task.deleted_at == None
@@ -541,6 +577,20 @@ async def update_task(
     
     # Update task fields
     update_data = task_data.dict(exclude_unset=True)
+
+    # Attachments: append new items if provided
+    if "attachments" in update_data:
+        new_attachments = update_data.pop("attachments") or []
+        for a in new_attachments:
+            task.attachments.append(
+                Attachment(
+                    file_name=a["file_name"],
+                    file_type=a["file_type"],
+                    file_data=a["file_data"],
+                    file_size=a["file_size"],
+                    uploaded_by=current_user.id,
+                )
+            )
     
     # Convert story_points to Decimal if provided
     if 'story_points' in update_data and update_data['story_points'] is not None:
@@ -600,6 +650,10 @@ async def update_task(
                 field_display_name=field_display_name
             )
         
+        # Convert due_date (date -> datetime) for Mongo compatibility
+        if field == "due_date" and value:
+            if isinstance(value, date):
+                value = datetime.combine(value, datetime.min.time())
         setattr(task, field, value)
     
     task.update_timestamp()
@@ -683,6 +737,83 @@ async def delete_task(
     )
     
     return None
+
+
+@router.post("/{task_id}/attachments", response_model=TaskResponse)
+async def add_task_attachment(
+    task_id: str,
+    attachment: AttachmentCreate,
+    current_user: User = Depends(require_permission("task", "update"))
+):
+    """Add an attachment to a task"""
+    from app.models.attachment import Attachment
+
+    task = await Task.find_one(
+        Task.id == uuid.UUID(task_id),
+        Task.deleted_at == None
+    )
+    if not task:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+
+    # Verify project belongs to organization
+    project = await Project.find_one(
+        Project.id == task.project_id,
+        Project.organization_id == current_user.organization_id,
+        Project.deleted_at == None
+    )
+    if not project:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+
+    task.attachments.append(
+        Attachment(
+            file_name=attachment.file_name,
+            file_type=attachment.file_type,
+            file_data=attachment.file_data,
+            file_size=attachment.file_size,
+            uploaded_by=current_user.id,
+        )
+    )
+    task.update_timestamp()
+    await task.save()
+    return task
+
+
+@router.delete("/{task_id}/attachments/{attachment_id}", response_model=TaskResponse)
+async def remove_task_attachment(
+    task_id: str,
+    attachment_id: str,
+    current_user: User = Depends(require_permission("task", "update"))
+):
+    """Remove an attachment from a task"""
+    task = await Task.find_one(
+        Task.id == uuid.UUID(task_id),
+        Task.deleted_at == None
+    )
+    if not task:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+
+    # Verify project belongs to organization
+    project = await Project.find_one(
+        Project.id == task.project_id,
+        Project.organization_id == current_user.organization_id,
+        Project.deleted_at == None
+    )
+    if not project:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+
+    try:
+        att_uuid = uuid.UUID(attachment_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid attachment ID")
+
+    before = len(task.attachments)
+    task.attachments = [a for a in task.attachments if a.id != att_uuid]
+    if len(task.attachments) == before:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attachment not found")
+
+    task.update_timestamp()
+    await task.save()
+    return task
 
 
 # Subtask endpoints

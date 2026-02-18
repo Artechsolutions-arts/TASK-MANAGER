@@ -5,7 +5,14 @@ from app.models.user import User
 from app.models.project import Project, ProjectTeam
 from app.models.task import Task
 from app.models.team import Team, TeamMember
-from app.schemas.project import ProjectCreate, ProjectUpdate, ProjectResponse, ProjectWithDetails
+from app.schemas.project import (
+    ProjectCreate,
+    ProjectUpdate,
+    ProjectResponse,
+    ProjectWithDetails,
+    AttachmentCreate,
+    AttachmentResponse,
+)
 from app.services.audit_service import AuditService
 from beanie.operators import In
 from datetime import datetime, date
@@ -22,9 +29,20 @@ async def create_project(
     """Create a new project"""
     from decimal import Decimal
     from datetime import datetime as dt
+    from app.services.permission_service import PermissionService
+    from app.models.attachment import Attachment
     
     # Use current_user.id as manager if not provided
     manager_id = project_data.manager_id or current_user.id
+    reported_by_id = project_data.reported_by_id or current_user.id
+
+    # Budget can be set only by CEO/Manager
+    permission_service = PermissionService()
+    user_roles = await permission_service.get_user_roles(str(current_user.id))
+    role_names = [r["role_name"] for r in user_roles]
+    can_budget = ("CEO" in role_names) or ("Manager" in role_names)
+    if project_data.budget is not None and not can_budget:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not allowed to set budgets")
     
     # Convert date to datetime for Beanie compatibility (date objects cause encoding issues)
     start_date_dt = None
@@ -42,15 +60,32 @@ async def create_project(
     
     project = Project(
         name=project_data.name,
+        company_name=project_data.company_name,
+        summary=project_data.summary,
         description=project_data.description,
         work_type=project_data.work_type,
+        category=project_data.category,
         status=project_data.status or "Planned",
         organization_id=current_user.organization_id,
         manager_id=manager_id,
+        reported_by_id=reported_by_id,
         team_lead_id=project_data.team_lead_id,
         start_date=start_date_dt,
         end_date=end_date_dt,
-        progress_percentage=Decimal("0.00")
+        progress_percentage=Decimal("0.00"),
+        labels=project_data.labels or [],
+        url=project_data.url,
+        budget=project_data.budget if can_budget else None,
+        attachments=[
+            Attachment(
+                file_name=a.file_name,
+                file_type=a.file_type,
+                file_data=a.file_data,
+                file_size=a.file_size,
+                uploaded_by=current_user.id,
+            )
+            for a in (project_data.attachments or [])
+        ],
     )
     await project.insert()
     
@@ -80,7 +115,18 @@ async def create_project(
         user_id=str(current_user.id)
     )
     
-    return project
+    project_dict = project.dict()
+    # Computed: original estimated days from start/end
+    if project.start_date and project.end_date:
+        project_dict["original_estimated_days"] = max(
+            0, (project.end_date.date() - project.start_date.date()).days
+        )
+    else:
+        project_dict["original_estimated_days"] = None
+    # Budget visibility
+    if not can_budget:
+        project_dict["budget"] = None
+    return project_dict
 
 
 @router.get("", response_model=List[ProjectResponse])
@@ -133,7 +179,22 @@ async def list_projects(
         query = query.find(Project.status == status_filter)
 
     projects = await query.sort(-Project.created_at).skip(skip).limit(limit).to_list()
-    return projects
+
+    # Budget visibility: only CEO/Manager
+    can_budget = ("CEO" in role_names) or ("Manager" in role_names)
+    items = []
+    for p in projects:
+        d = p.dict()
+        # Avoid sending inline base64 attachments in list views (fetch via GET /projects/{id})
+        d["attachments"] = []
+        if p.start_date and p.end_date:
+            d["original_estimated_days"] = max(0, (p.end_date.date() - p.start_date.date()).days)
+        else:
+            d["original_estimated_days"] = None
+        if not can_budget:
+            d["budget"] = None
+        items.append(d)
+    return items
 
 
 @router.get("/{project_id}/teams")
@@ -243,6 +304,7 @@ async def get_project(
     permission_service = PermissionService()
     user_roles = await permission_service.get_user_roles(str(current_user.id))
     role_names = [r["role_name"] for r in user_roles]
+    can_budget = ("CEO" in role_names) or ("Manager" in role_names)
     
     has_access = False
     if "CEO" in role_names:
@@ -304,6 +366,14 @@ async def get_project(
     project_dict["team_count"] = team_count
     project_dict["task_count"] = task_count
     project_dict["completed_task_count"] = completed_task_count
+    if project.start_date and project.end_date:
+        project_dict["original_estimated_days"] = max(
+            0, (project.end_date.date() - project.start_date.date()).days
+        )
+    else:
+        project_dict["original_estimated_days"] = None
+    if not can_budget:
+        project_dict["budget"] = None
     
     return project_dict
 
@@ -315,6 +385,9 @@ async def update_project(
     current_user: User = Depends(require_permission("project", "update"))
 ):
     """Update project"""
+    from app.services.permission_service import PermissionService
+    from app.models.attachment import Attachment
+
     project = await Project.find_one(
         Project.id == uuid.UUID(project_id),
         Project.organization_id == current_user.organization_id,
@@ -330,7 +403,28 @@ async def update_project(
     # Handle team assignments separately
     team_ids = project_data.team_ids
     update_data = project_data.dict(exclude_unset=True, exclude={'team_ids'})
+
+    permission_service = PermissionService()
+    user_roles = await permission_service.get_user_roles(str(current_user.id))
+    role_names = [r["role_name"] for r in user_roles]
+    can_budget = ("CEO" in role_names) or ("Manager" in role_names)
+    if "budget" in update_data and update_data["budget"] is not None and not can_budget:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not allowed to set budgets")
     
+    # Attachments: append new items if provided
+    if "attachments" in update_data:
+        new_attachments = update_data.pop("attachments") or []
+        for a in new_attachments:
+            project.attachments.append(
+                Attachment(
+                    file_name=a["file_name"],
+                    file_type=a["file_type"],
+                    file_data=a["file_data"],
+                    file_size=a["file_size"],
+                    uploaded_by=current_user.id,
+                )
+            )
+
     # Update fields
     for field, value in update_data.items():
         # Convert date strings to datetime if needed
@@ -338,6 +432,8 @@ async def update_project(
             from datetime import datetime as dt
             if isinstance(value, date):
                 value = dt.combine(value, dt.min.time())
+        if field == "budget" and not can_budget:
+            value = None
         setattr(project, field, value)
     
     project.update_timestamp()
@@ -387,7 +483,104 @@ async def update_project(
         changes={"updated_fields": list(update_data.keys()) + (['team_ids'] if team_ids is not None else [])}
     )
     
-    return project
+    project_dict = project.dict()
+    if project.start_date and project.end_date:
+        project_dict["original_estimated_days"] = max(
+            0, (project.end_date.date() - project.start_date.date()).days
+        )
+    else:
+        project_dict["original_estimated_days"] = None
+    if not can_budget:
+        project_dict["budget"] = None
+    return project_dict
+
+
+@router.post("/{project_id}/attachments", response_model=ProjectResponse)
+async def add_project_attachment(
+    project_id: str,
+    attachment: AttachmentCreate,
+    current_user: User = Depends(require_permission("project", "update"))
+):
+    from app.models.attachment import Attachment
+    from app.services.permission_service import PermissionService
+
+    project = await Project.find_one(
+        Project.id == uuid.UUID(project_id),
+        Project.organization_id == current_user.organization_id,
+        Project.deleted_at == None
+    )
+    if not project:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+
+    project.attachments.append(
+        Attachment(
+            file_name=attachment.file_name,
+            file_type=attachment.file_type,
+            file_data=attachment.file_data,
+            file_size=attachment.file_size,
+            uploaded_by=current_user.id,
+        )
+    )
+    project.update_timestamp()
+    await project.save()
+
+    permission_service = PermissionService()
+    user_roles = await permission_service.get_user_roles(str(current_user.id))
+    role_names = [r["role_name"] for r in user_roles]
+    can_budget = ("CEO" in role_names) or ("Manager" in role_names)
+
+    d = project.dict()
+    if project.start_date and project.end_date:
+        d["original_estimated_days"] = max(0, (project.end_date.date() - project.start_date.date()).days)
+    else:
+        d["original_estimated_days"] = None
+    if not can_budget:
+        d["budget"] = None
+    return d
+
+
+@router.delete("/{project_id}/attachments/{attachment_id}", response_model=ProjectResponse)
+async def remove_project_attachment(
+    project_id: str,
+    attachment_id: str,
+    current_user: User = Depends(require_permission("project", "update"))
+):
+    from app.services.permission_service import PermissionService
+
+    project = await Project.find_one(
+        Project.id == uuid.UUID(project_id),
+        Project.organization_id == current_user.organization_id,
+        Project.deleted_at == None
+    )
+    if not project:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+
+    try:
+        att_uuid = uuid.UUID(attachment_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid attachment ID")
+
+    before = len(project.attachments)
+    project.attachments = [a for a in project.attachments if a.id != att_uuid]
+    if len(project.attachments) == before:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attachment not found")
+
+    project.update_timestamp()
+    await project.save()
+
+    permission_service = PermissionService()
+    user_roles = await permission_service.get_user_roles(str(current_user.id))
+    role_names = [r["role_name"] for r in user_roles]
+    can_budget = ("CEO" in role_names) or ("Manager" in role_names)
+
+    d = project.dict()
+    if project.start_date and project.end_date:
+        d["original_estimated_days"] = max(0, (project.end_date.date() - project.start_date.date()).days)
+    else:
+        d["original_estimated_days"] = None
+    if not can_budget:
+        d["budget"] = None
+    return d
 
 
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)

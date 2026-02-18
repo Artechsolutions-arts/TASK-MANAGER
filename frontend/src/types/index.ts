@@ -20,23 +20,43 @@ export interface Role {
 export interface Project {
   id: string;
   name: string;
+  company_name?: string | null;
+  summary?: string | null;
   description?: string;
   work_type?: string | null;
+  category?: string | null;
   status: string;
   organization_id: string;
   manager_id: string;
+  reported_by_id?: string | null;
   team_lead_id?: string;
   start_date?: string;
   end_date?: string;
   progress_percentage: number;
+  labels?: string[];
+  url?: string | null;
+  budget?: number | null;
+  attachments?: Attachment[];
+  original_estimated_days?: number | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface Attachment {
+  id: string;
+  file_name: string;
+  file_type: string;
+  file_data: string; // Base64
+  file_size: number;
+  uploaded_by?: string | null;
+  uploaded_at: string;
 }
 
 export interface Task {
   id: string;
   title: string;
   description?: string;
+  category?: string;
   project_id: string;
   story_id?: string;
   sprint_id?: string;  // Optional sprint assignment
@@ -48,6 +68,8 @@ export interface Task {
   estimated_hours?: number;
   story_points?: number;  // Story points for sprint planning
   position: number;
+  labels?: string[];
+  attachments?: Attachment[];
   created_at: string;
   updated_at: string;
 }
@@ -103,6 +125,10 @@ export interface Team {
   description?: string;
   organization_id: string;
   team_lead_id: string;
+  privacy?: 'private' | 'public';
+  tags?: string[];
+  default_task_status?: string;
+  default_task_priority?: string;
   members?: TeamMember[];
   created_at: string;
   updated_at: string;
@@ -112,6 +138,7 @@ export interface TeamMember {
   id: string;
   team_id: string;
   user_id: string;
+  role?: string;
   joined_at: string;
   left_at?: string;
 }

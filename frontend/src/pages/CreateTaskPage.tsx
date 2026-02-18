@@ -25,6 +25,7 @@ export default function CreateTaskPage() {
   const [formData, setFormData] = useState<Partial<Task>>({
     title: '',
     description: '',
+    category: '',
     project_id: '',
     status: 'To Do',
     priority: 'Medium',
@@ -33,6 +34,8 @@ export default function CreateTaskPage() {
     estimated_hours: undefined,
     story_points: undefined,
   });
+  const [labelsText, setLabelsText] = useState('');
+  const [attachments, setAttachments] = useState<Array<{ file_name: string; file_type: string; file_data: string; file_size: number }>>([]);
   const [error, setError] = useState('');
   const [aiSuggestion, setAiSuggestion] = useState<any>(null);
   const [showAiSuggestion, setShowAiSuggestion] = useState(false);
@@ -151,6 +154,7 @@ export default function CreateTaskPage() {
     const taskData = {
       title: formData.title,
       description: formData.description || undefined,
+      category: (formData as any).category || undefined,
       project_id: formData.project_id,
       status: formData.status || 'To Do',
       priority: formData.priority || 'Medium',
@@ -160,6 +164,11 @@ export default function CreateTaskPage() {
       estimated_hours: formData.estimated_hours ? Number(formData.estimated_hours) : undefined,
       story_points: formData.story_points ? Number(formData.story_points) : undefined,
       sprint_id: formData.sprint_id || undefined,
+      labels: labelsText
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean),
+      attachments: attachments.length > 0 ? attachments : undefined,
     };
 
     createMutation.mutate(taskData);
@@ -217,6 +226,92 @@ export default function CreateTaskPage() {
                 <p className="mt-1 text-xs text-gray-500">
                   No projects available. Projects must be assigned to your team.
                 </p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                  Project/category
+                </label>
+                <input
+                  type="text"
+                  id="category"
+                  value={(formData as any).category || ''}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value } as any)}
+                  className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="e.g., Marketing, App Development"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="labels" className="block text-sm font-medium text-gray-700 mb-1">
+                  Labels
+                </label>
+                <input
+                  type="text"
+                  id="labels"
+                  value={labelsText}
+                  onChange={(e) => setLabelsText(e.target.value)}
+                  className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="e.g., urgent, client"
+                />
+                <p className="mt-1 text-xs text-gray-500">Comma-separated</p>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Attachments
+              </label>
+              <input
+                type="file"
+                multiple
+                onChange={async (e) => {
+                  const files = Array.from(e.target.files || []);
+                  if (files.length === 0) return;
+                  try {
+                    const toBase64 = (file: File) =>
+                      new Promise<string>((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                      });
+                    const newAttachments = await Promise.all(
+                      files.map(async (f) => ({
+                        file_name: f.name,
+                        file_type: f.type || 'application/octet-stream',
+                        file_data: await toBase64(f),
+                        file_size: f.size,
+                      }))
+                    );
+                    setAttachments((prev) => [...prev, ...newAttachments]);
+                    e.currentTarget.value = '';
+                  } catch {
+                    setError('Failed to read attachment(s)');
+                  }
+                }}
+                className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-600 file:text-white hover:file:bg-primary-700"
+              />
+              {attachments.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {attachments.map((a, idx) => (
+                    <div key={`${a.file_name}-${idx}`} className="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2">
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-gray-900 truncate">{a.file_name}</div>
+                        <div className="text-xs text-gray-500">{Math.round(a.file_size / 1024)} KB</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setAttachments((prev) => prev.filter((_, i) => i !== idx))}
+                        className="text-sm text-red-600 hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
 

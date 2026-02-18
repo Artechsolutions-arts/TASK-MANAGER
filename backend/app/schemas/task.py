@@ -1,16 +1,31 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, Field
+from typing import Optional, List
 from datetime import datetime, date
 from uuid import UUID
 from decimal import Decimal
 
 
+class AttachmentCreate(BaseModel):
+    file_name: str
+    file_type: str
+    file_data: str  # Base64
+    file_size: int
+
+
+class AttachmentResponse(AttachmentCreate):
+    id: UUID
+    uploaded_by: Optional[UUID] = None
+    uploaded_at: datetime
+
+
 class TaskBase(BaseModel):
     title: str
     description: Optional[str] = None
+    category: Optional[str] = None
     status: str = "Backlog"
     priority: str = "Medium"
     due_date: Optional[date] = None
+    labels: List[str] = Field(default_factory=list)
 
 
 class EpicCreate(TaskBase):
@@ -79,6 +94,7 @@ class TaskCreate(TaskBase):
     estimated_hours: Optional[Decimal] = None
     story_points: Optional[Decimal] = None  # Story points for sprint planning
     position: Optional[int] = None
+    attachments: Optional[List[AttachmentCreate]] = None
 
     class Config:
         json_encoders = {
@@ -89,6 +105,7 @@ class TaskCreate(TaskBase):
 class TaskUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
+    category: Optional[str] = None
     status: Optional[str] = None
     priority: Optional[str] = None
     sprint_id: Optional[UUID] = None  # Optional sprint assignment
@@ -97,6 +114,8 @@ class TaskUpdate(BaseModel):
     estimated_hours: Optional[Decimal] = None
     story_points: Optional[Decimal] = None  # Story points for sprint planning
     position: Optional[int] = None
+    labels: Optional[List[str]] = None
+    attachments: Optional[List[AttachmentCreate]] = None
 
 
 class TaskResponse(TaskBase):
@@ -109,6 +128,7 @@ class TaskResponse(TaskBase):
     estimated_hours: Optional[Decimal] = None
     story_points: Optional[Decimal] = None  # Story points for sprint planning
     position: int
+    attachments: List[AttachmentResponse] = []
     created_at: datetime
     updated_at: datetime
     

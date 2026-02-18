@@ -6,8 +6,11 @@ import {
   Rocket, 
   Ban, 
   Trash2,
-  X
+  Star
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { isStarred, toggleStarred } from '../utils/prefs';
+import { useMemo, useState } from 'react';
 
 interface ProjectCardProps {
   project: Project;
@@ -15,6 +18,10 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project, onDelete }: ProjectCardProps) {
+  const { user } = useAuth();
+  const [starTick, setStarTick] = useState(0);
+  const starred = useMemo(() => isStarred('project', user?.id, project.id), [user?.id, project.id, starTick]);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Completed':
@@ -67,19 +74,43 @@ export default function ProjectCard({ project, onDelete }: ProjectCardProps) {
             </p>
           </div>
         </div>
-        {onDelete && (
+        <div className="flex items-center gap-1">
           <button
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              onDelete(project.id);
+              toggleStarred('project', user?.id, {
+                id: project.id,
+                label: project.name,
+                path: `/projects/${project.id}`,
+              });
+              setStarTick((x) => x + 1);
             }}
-            className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 p-1 z-10"
-            aria-label="Delete project"
+            className={`transition-colors p-1 z-10 ${
+              starred
+                ? 'text-yellow-500 hover:text-yellow-600'
+                : 'text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400'
+            }`}
+            aria-label={starred ? 'Unstar project' : 'Star project'}
+            title={starred ? 'Starred' : 'Star'}
           >
-            <Trash2 className="w-5 h-5" />
+            <Star className={`w-5 h-5 ${starred ? 'fill-current' : ''}`} />
           </button>
-        )}
+
+          {onDelete && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete(project.id);
+              }}
+              className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 p-1 z-10"
+              aria-label="Delete project"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          )}
+        </div>
       </div>
 
       {project.description && (

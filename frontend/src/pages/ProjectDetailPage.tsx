@@ -1,24 +1,35 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { projectsAPI, tasksAPI, usersAPI } from '../services/api';
-import { Calendar, Users, User, Briefcase, Edit, Clock, CheckCircle2, PlayCircle, ListTodo, Workflow } from 'lucide-react';
+import { Calendar, Users, User, Briefcase, Edit, Clock, CheckCircle2, PlayCircle, ListTodo, Workflow, Link2, Paperclip, Star } from 'lucide-react';
 import { useUserRole } from '../utils/permissions';
 import { useMemo, useEffect, useState } from 'react';
 import type { Task } from '../types';
 import TeamDiscussionSection from '../components/TeamDiscussionSection';
+import { useAuth } from '../context/AuthContext';
+import { pushRecent, isStarred, toggleStarred } from '../utils/prefs';
 
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { canCreateProject } = useUserRole(); // Same permission as create for edit
+  const { canCreateProject, isCEO, isManager } = useUserRole(); // Same permission as create for edit
+  const canSeeBudget = isCEO || isManager;
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+  const { user } = useAuth();
+  const [starTick, setStarTick] = useState(0);
 
   const { data: project, isLoading: projectLoading } = useQuery({
     queryKey: ['project', id],
     queryFn: () => projectsAPI.get(id!),
     enabled: !!id,
   });
+
+  useEffect(() => {
+    if (project?.id) {
+      pushRecent('project', user?.id, { id: project.id, label: project.name, path: `/projects/${project.id}` });
+    }
+  }, [project?.id, project?.name, user?.id]);
 
   const { data: tasks, isLoading: tasksLoading, refetch: refetchTasks } = useQuery({
     queryKey: ['tasks', id],
@@ -96,6 +107,14 @@ export default function ProjectDetailPage() {
   const getAssigneeUser = (assigneeId: string) => {
     if (assigneeId === 'unassigned') return null;
     return allUsers.find((u: any) => u.id === assigneeId) || null;
+  };
+
+  const getUserDisplayName = (userId?: string) => {
+    if (!userId) return null;
+    const u = allUsers.find((x: any) => x.id === userId);
+    if (!u) return null;
+    const fullName = `${u.first_name || ''} ${u.last_name || ''}`.trim();
+    return fullName || u.email;
   };
 
   // Format date for display
@@ -242,6 +261,8 @@ export default function ProjectDetailPage() {
     );
   }
 
+  const projectStarred = project?.id ? isStarred('project', user?.id, project.id) : false;
+
   return (
     <div className="px-4 py-6 sm:px-0">
       <div className="mb-6">
@@ -250,25 +271,47 @@ export default function ProjectDetailPage() {
         </Link>
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{project.name}</h1>
-          {canCreateProject && (
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => navigate(`/projects/${id}/edit`)}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              onClick={() => {
+                toggleStarred('project', user?.id, { id: project.id, label: project.name, path: `/projects/${project.id}` });
+                setStarTick((x) => x + 1);
+              }}
+              className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
+                projectStarred
+                  ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800'
+                  : 'text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+              title={projectStarred ? 'Starred' : 'Star'}
             >
-              <Edit className="w-4 h-4 mr-2" />
-              Edit Project
+              <Star className={`w-4 h-4 ${projectStarred ? 'fill-current' : ''}`} />
             </button>
-          )}
-          {canCreateProject && (
-            <button
-              onClick={() => navigate(`/projects/${id}/workflow`)}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <Workflow className="w-4 h-4 mr-2" />
-              Workflow Settings
-            </button>
-          )}
+
+            {canCreateProject && (
+              <button
+                onClick={() => navigate(`/projects/${id}/edit`)}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Project
+              </button>
+            )}
+            {canCreateProject && (
+              <button
+                onClick={() => navigate(`/projects/${id}/workflow`)}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <Workflow className="w-4 h-4 mr-2" />
+                Workflow Settings
+              </button>
+            )}
+          </div>
         </div>
+        {((project as any).summary || '').trim() && (
+          <p className="mt-2 text-gray-700 dark:text-gray-300 font-medium">
+            {(project as any).summary}
+          </p>
+        )}
         <p className="mt-2 text-gray-600 dark:text-gray-400">{project.description || 'No description provided'}</p>
         <div className="mt-4 flex items-center space-x-4 flex-wrap gap-2">
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -291,6 +334,28 @@ export default function ProjectDetailPage() {
       <div className="mb-6 bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Project Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Company */}
+            <div className="flex items-start space-x-3">
+              <Briefcase className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Company name</p>
+                <p className="text-sm text-gray-900 dark:text-white mt-1">
+                  {(project as any).company_name ? (project as any).company_name : <span className="text-gray-400 italic">Not set</span>}
+                </p>
+              </div>
+            </div>
+
+            {/* Owner */}
+            <div className="flex items-start space-x-3">
+              <User className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Owner</p>
+                <p className="text-sm text-gray-900 dark:text-white mt-1">
+                  {getUserDisplayName(project.manager_id) || <span className="text-gray-400 italic">Not set</span>}
+                </p>
+              </div>
+            </div>
+
             {/* What we are building */}
             <div className="flex items-start space-x-3">
               <Briefcase className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
@@ -298,6 +363,17 @@ export default function ProjectDetailPage() {
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">What we are building</p>
                 <p className="text-sm text-gray-900 dark:text-white mt-1">
                   {project.work_type ? project.work_type : <span className="text-gray-400 italic">Not set</span>}
+                </p>
+              </div>
+            </div>
+
+            {/* Project category/type */}
+            <div className="flex items-start space-x-3">
+              <ListTodo className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Project category/type</p>
+                <p className="text-sm text-gray-900 dark:text-white mt-1">
+                  {(project as any).category ? (project as any).category : <span className="text-gray-400 italic">Not set</span>}
                 </p>
               </div>
             </div>
@@ -321,6 +397,17 @@ export default function ProjectDetailPage() {
               </div>
             </div>
 
+            {/* Reported by */}
+            <div className="flex items-start space-x-3">
+              <User className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Reported by</p>
+                <p className="text-sm text-gray-900 dark:text-white mt-1">
+                  {getUserDisplayName((project as any).reported_by_id) || <span className="text-gray-400 italic">Not set</span>}
+                </p>
+              </div>
+            </div>
+
             {/* Start Date */}
             <div className="flex items-start space-x-3">
               <Calendar className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
@@ -340,6 +427,167 @@ export default function ProjectDetailPage() {
                 <p className="text-sm text-gray-900 dark:text-white mt-1">
                   {project.end_date ? formatDate(project.end_date) : <span className="text-gray-400 italic">Not set</span>}
                 </p>
+              </div>
+            </div>
+
+            {/* Original estimate */}
+            <div className="flex items-start space-x-3">
+              <Clock className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Original estimated (days)</p>
+                <p className="text-sm text-gray-900 dark:text-white mt-1">
+                  {(project as any).original_estimated_days != null ? (project as any).original_estimated_days : <span className="text-gray-400 italic">Calculated from start/end</span>}
+                </p>
+              </div>
+            </div>
+
+            {/* Budget (CEO/Manager only) */}
+            {canSeeBudget && (
+              <div className="flex items-start space-x-3">
+                <Briefcase className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Budget</p>
+                  <p className="text-sm text-gray-900 dark:text-white mt-1">
+                    {(project as any).budget != null ? (project as any).budget : <span className="text-gray-400 italic">Not set</span>}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Labels + URL + Attachments */}
+          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex items-start space-x-3">
+                <ListTodo className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Labels</p>
+                  {Array.isArray((project as any).labels) && (project as any).labels.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {(project as any).labels.map((l: string) => (
+                        <span key={l} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+                          {l}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-400 dark:text-gray-500 italic">No labels</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3">
+                <Link2 className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">URL</p>
+                  {(project as any).url ? (
+                    <a
+                      href={(project as any).url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm text-primary-600 dark:text-primary-400 hover:underline break-all"
+                    >
+                      {(project as any).url}
+                    </a>
+                  ) : (
+                    <p className="text-sm text-gray-400 dark:text-gray-500 italic mt-1">Not set</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3">
+              <Paperclip className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Attachments</p>
+                  {canCreateProject && (
+                    <input
+                      type="file"
+                      multiple
+                      onChange={async (e) => {
+                        const files = Array.from(e.target.files || []);
+                        if (files.length === 0) return;
+                        const toBase64 = (file: File) =>
+                          new Promise<string>((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+                            reader.onerror = reject;
+                            reader.readAsDataURL(file);
+                          });
+                        try {
+                          for (const f of files) {
+                            await projectsAPI.addAttachment(id!, {
+                              file_name: f.name,
+                              file_type: f.type || 'application/octet-stream',
+                              file_data: await toBase64(f),
+                              file_size: f.size,
+                            });
+                          }
+                          queryClient.invalidateQueries({ queryKey: ['project', id] });
+                          e.currentTarget.value = '';
+                        } catch {
+                          // ignore
+                        }
+                      }}
+                      className="text-xs text-gray-700 dark:text-gray-200 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-primary-600 file:text-white hover:file:bg-primary-700"
+                    />
+                  )}
+                </div>
+
+                {Array.isArray((project as any).attachments) && (project as any).attachments.length > 0 ? (
+                  <div className="mt-3 space-y-2">
+                    {(project as any).attachments.map((a: any) => (
+                      <div key={a.id} className="flex items-center justify-between rounded-md border border-gray-200 dark:border-gray-700 px-3 py-2">
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{a.file_name}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">{Math.round((a.file_size || 0) / 1024)} KB</div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              try {
+                                const byteString = atob(a.file_data || '');
+                                const ab = new ArrayBuffer(byteString.length);
+                                const ia = new Uint8Array(ab);
+                                for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+                                const blob = new Blob([ab], { type: a.file_type || 'application/octet-stream' });
+                                const url = URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = a.file_name || 'attachment';
+                                document.body.appendChild(link);
+                                link.click();
+                                link.remove();
+                                URL.revokeObjectURL(url);
+                              } catch {
+                                // ignore
+                              }
+                            }}
+                            className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400"
+                          >
+                            Download
+                          </button>
+                          {canCreateProject && (
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                await projectsAPI.removeAttachment(id!, a.id);
+                                queryClient.invalidateQueries({ queryKey: ['project', id] });
+                              }}
+                              className="text-sm text-red-600 hover:text-red-700 dark:text-red-400"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-2 text-sm text-gray-400 dark:text-gray-500 italic">No attachments</p>
+                )}
               </div>
             </div>
           </div>
