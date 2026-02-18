@@ -122,16 +122,16 @@ export default function ReportsPage() {
       ) : (
         <>
       {/* Filters */}
-      <div className="card p-4 mb-6 bg-white dark:bg-gray-800">
+      <div className="card p-4 mb-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               Project
             </label>
             <select
               value={selectedProject}
               onChange={(e) => setSelectedProject(e.target.value)}
-              className="w-full h-9 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
+              className="w-full h-9 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
             >
               <option value="all">All Projects</option>
               {projects.map((project: any) => (
@@ -142,13 +142,13 @@ export default function ReportsPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               Time Range
             </label>
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
-              className="w-full h-9 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
+              className="w-full h-9 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
             >
               <option value="7">Last 7 days</option>
               <option value="30">Last 30 days</option>
@@ -220,15 +220,13 @@ export default function ReportsPage() {
                       <XAxis 
                         dataKey="name" 
                         stroke="#6b7280" 
-                        className="dark:stroke-gray-400"
                         tick={{ fill: '#6b7280' }}
-                        className="dark:[&_text]:fill-gray-400"
+                        className="dark:stroke-gray-400 dark:[&_text]:fill-gray-400"
                       />
                       <YAxis 
                         stroke="#6b7280" 
-                        className="dark:stroke-gray-400"
                         tick={{ fill: '#6b7280' }}
-                        className="dark:[&_text]:fill-gray-400"
+                        className="dark:stroke-gray-400 dark:[&_text]:fill-gray-400"
                       />
                       <Tooltip 
                         contentStyle={tooltipStyle}
@@ -260,16 +258,14 @@ export default function ReportsPage() {
                       <XAxis
                         dataKey="date"
                         stroke="#6b7280"
-                        className="dark:stroke-gray-400"
                         tick={{ fill: '#6b7280' }}
-                        className="dark:[&_text]:fill-gray-400"
+                        className="dark:stroke-gray-400 dark:[&_text]:fill-gray-400"
                         tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       />
                       <YAxis 
                         stroke="#6b7280" 
-                        className="dark:stroke-gray-400"
                         tick={{ fill: '#6b7280' }}
-                        className="dark:[&_text]:fill-gray-400"
+                        className="dark:stroke-gray-400 dark:[&_text]:fill-gray-400"
                       />
                       <Tooltip
                         contentStyle={tooltipStyle}

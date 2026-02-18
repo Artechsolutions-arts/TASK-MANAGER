@@ -12,8 +12,10 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // Always use system theme - no manual toggle
-  const [theme] = useState<Theme>('system');
+  const [theme, setThemeState] = useState<Theme>(() => {
+    const stored = localStorage.getItem('theme') as Theme | null;
+    return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+  });
 
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
     if (theme === 'system') {
@@ -55,12 +57,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [theme]);
 
-  const setTheme = (_newTheme: Theme) => {
-    // Theme is always system - no manual changes allowed
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme);
+    localStorage.setItem('theme', newTheme);
   };
 
   const toggleTheme = () => {
-    // Theme is always system - no manual toggle allowed
+    const next = resolvedTheme === 'light' ? 'dark' : 'light';
+    setThemeState(next);
+    localStorage.setItem('theme', next);
   };
 
   return (
