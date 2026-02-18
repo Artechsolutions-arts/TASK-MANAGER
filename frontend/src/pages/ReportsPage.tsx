@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { analyticsAPI, projectsAPI } from '../services/api';
 import { useUserRole } from '../utils/permissions';
+import { useTheme } from '../context/ThemeContext';
 import ReportsList from '../components/ReportsList';
 import SubmitReportForm from '../components/SubmitReportForm';
 import {
@@ -22,6 +23,15 @@ export default function ReportsPage() {
   const [timeRange, setTimeRange] = useState<string>('30');
   const [activeTab, setActiveTab] = useState<'analytics' | 'reports' | 'submit'>('analytics');
   const { canViewReports } = useUserRole();
+  const { resolvedTheme } = useTheme();
+  
+  const isDark = resolvedTheme === 'dark';
+  const tooltipStyle = useMemo(() => ({
+    backgroundColor: isDark ? 'rgb(31, 41, 55)' : 'rgb(255, 255, 255)',
+    border: `1px solid ${isDark ? 'rgb(55, 65, 81)' : '#e5e7eb'}`,
+    borderRadius: '6px',
+    color: isDark ? 'rgb(243, 244, 246)' : '#111827',
+  }), [isDark]);
 
   // Fetch dashboard data
   const { data: dashboardData, isLoading: dashboardLoading } = useQuery({
@@ -203,17 +213,29 @@ export default function ReportsPage() {
                   You don't have permission to view workload data
                 </div>
               ) : workloadChartData.length > 0 ? (
-                <div style={{ width: '100%', height: '300px', backgroundColor: 'transparent' }} className="dark:bg-gray-800">
+                <div style={{ width: '100%', height: '300px' }} className="dark:bg-gray-800">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={workloadChartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
-                      <XAxis dataKey="name" stroke="#6b7280" className="dark:stroke-gray-400" />
-                      <YAxis stroke="#6b7280" className="dark:stroke-gray-400" />
-                      <Tooltip 
-                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px' }}
-                        className="dark:!bg-gray-800 dark:!border-gray-700 dark:!text-white"
+                      <XAxis 
+                        dataKey="name" 
+                        stroke="#6b7280" 
+                        className="dark:stroke-gray-400"
+                        tick={{ fill: '#6b7280' }}
+                        className="dark:[&_text]:fill-gray-400"
                       />
-                      <Legend />
+                      <YAxis 
+                        stroke="#6b7280" 
+                        className="dark:stroke-gray-400"
+                        tick={{ fill: '#6b7280' }}
+                        className="dark:[&_text]:fill-gray-400"
+                      />
+                      <Tooltip 
+                        contentStyle={tooltipStyle}
+                      />
+                      <Legend 
+                        wrapperStyle={{ color: isDark ? 'rgb(243, 244, 246)' : '#111827' }}
+                      />
                       <Bar dataKey="tasks" fill="#3b82f6" name="Total Tasks" />
                       <Bar dataKey="completed" fill="#10b981" name="Completed" />
                       <Bar dataKey="overdue" fill="#ef4444" name="Overdue" />
@@ -231,7 +253,7 @@ export default function ReportsPage() {
             {burndownData.length > 0 ? (
               <div className="card p-6 bg-white dark:bg-gray-800">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Burndown Chart</h2>
-                <div style={{ width: '100%', height: '300px', backgroundColor: 'transparent' }} className="dark:bg-gray-800">
+                <div style={{ width: '100%', height: '300px' }} className="dark:bg-gray-800">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={burndownData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
@@ -239,15 +261,23 @@ export default function ReportsPage() {
                         dataKey="date"
                         stroke="#6b7280"
                         className="dark:stroke-gray-400"
+                        tick={{ fill: '#6b7280' }}
+                        className="dark:[&_text]:fill-gray-400"
                         tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       />
-                      <YAxis stroke="#6b7280" className="dark:stroke-gray-400" />
+                      <YAxis 
+                        stroke="#6b7280" 
+                        className="dark:stroke-gray-400"
+                        tick={{ fill: '#6b7280' }}
+                        className="dark:[&_text]:fill-gray-400"
+                      />
                       <Tooltip
-                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px' }}
-                        className="dark:!bg-gray-800 dark:!border-gray-700 dark:!text-white"
+                        contentStyle={tooltipStyle}
                         labelFormatter={(value) => new Date(value).toLocaleDateString()}
                       />
-                      <Legend />
+                      <Legend 
+                        wrapperStyle={{ color: isDark ? 'rgb(243, 244, 246)' : '#111827' }}
+                      />
                       <Line
                         type="monotone"
                         dataKey="planned_hours"

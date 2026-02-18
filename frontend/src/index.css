@@ -66,6 +66,12 @@
     scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
   }
 
+  /* Dark theme select dropdown options */
+  .dark select option {
+    background-color: rgb(31, 41, 55); /* gray-800 */
+    color: rgb(243, 244, 246); /* gray-100 */
+  }
+
   code {
     font-family: 'SF Mono', Monaco, 'Courier New', monospace;
   }
