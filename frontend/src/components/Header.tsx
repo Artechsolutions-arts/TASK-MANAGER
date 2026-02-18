@@ -13,8 +13,11 @@ import {
   CheckSquare, 
   Users, 
   Settings as SettingsIcon,
-  ChevronRight
+  ChevronRight,
+  Sun,
+  Moon
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Header() {
   const location = useLocation();
@@ -22,6 +25,7 @@ export default function Header() {
   const [searchParams] = useSearchParams();
   const { user, logout } = useAuth();
   const { canCreateProject, canCreateTask, isTeamLead } = useUserRole();
+  const { resolvedTheme, toggleTheme } = useTheme();
   const [showCreateMenu, setShowCreateMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -276,6 +280,26 @@ export default function Header() {
             )}
           </div>
         )}
+
+        {/* Theme indicator - always visible so every tab shows current theme */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          title={`Current theme: ${resolvedTheme}. Click to switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode.`}
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium border transition-colors ${
+            resolvedTheme === 'dark'
+              ? 'bg-gray-800 text-gray-100 border-gray-600 hover:bg-gray-700'
+              : 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200'
+          }`}
+          aria-label={`Theme: ${resolvedTheme}. Click to toggle.`}
+        >
+          {resolvedTheme === 'dark' ? (
+            <Moon className="w-4 h-4" aria-hidden />
+          ) : (
+            <Sun className="w-4 h-4" aria-hidden />
+          )}
+          <span className="hidden sm:inline">{resolvedTheme === 'dark' ? 'Dark' : 'Light'}</span>
+        </button>
 
         {/* Notifications */}
         <div className="relative" ref={notificationsRef}>
