@@ -14,7 +14,9 @@ import {
   FileText,
   UserPlus,
   Star,
-  Filter
+  Filter,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
@@ -78,6 +80,8 @@ export default function Sidebar({ onExpandedChange }: { onExpandedChange?: (expa
   const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
   const [, setPrefsTick] = useState(0);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [starredOpen, setStarredOpen] = useState(false);
 
   useEffect(() => {
     const handler = () => setPrefsTick((x) => x + 1);
@@ -156,69 +160,89 @@ export default function Sidebar({ onExpandedChange }: { onExpandedChange?: (expa
         {!isAdmin && isExpanded && (
           <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-800 space-y-6">
             <div>
-              <div className="px-3 mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <button
+                onClick={() => setFiltersOpen(!filtersOpen)}
+                className="w-full px-3 mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+              >
                 <Filter className="w-4 h-4" />
-                Filters
-              </div>
-              <div className="space-y-1">
-                {[
-                  { label: 'My open work items', path: '/tasks?filter=my_open' },
-                  { label: 'Reported by me', path: '/tasks?filter=reported_by_me' },
-                  { label: 'All work items', path: '/tasks?filter=all' },
-                  { label: 'Done work items', path: '/tasks?filter=done' },
-                  { label: 'Open work items', path: '/tasks?filter=open' },
-                  { label: 'Viewed recently', path: '/tasks?filter=viewed_recently' },
-                  { label: 'Created recently', path: '/tasks?filter=created_recently' },
-                  { label: 'Resolved recently', path: '/tasks?filter=resolved_recently' },
-                ].map((f) => (
-                  <Link
-                    key={f.path}
-                    to={f.path}
-                    className={`block rounded-lg px-3 py-2 text-sm transition-colors ${
-                      location.pathname.startsWith('/tasks') && location.search === f.path.replace('/tasks', '')
-                        ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
-                    }`}
-                  >
-                    {f.label}
-                  </Link>
-                ))}
-              </div>
+                <span className="flex-1 text-left">Filters</span>
+                {filtersOpen ? (
+                  <ChevronDown className="w-4 h-4" />
+                ) : (
+                  <ChevronRight className="w-4 h-4" />
+                )}
+              </button>
+              {filtersOpen && (
+                <div className="space-y-1">
+                  {[
+                    { label: 'My open work items', path: '/tasks?filter=my_open' },
+                    { label: 'Reported by me', path: '/tasks?filter=reported_by_me' },
+                    { label: 'All work items', path: '/tasks?filter=all' },
+                    { label: 'Done work items', path: '/tasks?filter=done' },
+                    { label: 'Open work items', path: '/tasks?filter=open' },
+                    { label: 'Viewed recently', path: '/tasks?filter=viewed_recently' },
+                    { label: 'Created recently', path: '/tasks?filter=created_recently' },
+                    { label: 'Resolved recently', path: '/tasks?filter=resolved_recently' },
+                  ].map((f) => (
+                    <Link
+                      key={f.path}
+                      to={f.path}
+                      className={`block rounded-lg px-3 py-2 text-sm transition-colors ${
+                        location.pathname.startsWith('/tasks') && location.search === f.path.replace('/tasks', '')
+                          ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                      }`}
+                    >
+                      {f.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>
-              <div className="px-3 mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <button
+                onClick={() => setStarredOpen(!starredOpen)}
+                className="w-full px-3 mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+              >
                 <Star className="w-4 h-4" />
-                Starred
-              </div>
-              <div className="space-y-2">
-                {(['project', 'task', 'team'] as const).map((entity) => {
-                  const items = getStarred(entity, user?.id);
-                  if (!items.length) return null;
-                  const title = entity === 'project' ? 'Projects' : entity === 'task' ? 'Tasks' : 'Teams';
-                  return (
-                    <div key={entity} className="px-3">
-                      <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{title}</div>
-                      <div className="space-y-1">
-                        {items.slice(0, 5).map((it) => (
-                          <Link
-                            key={it.id}
-                            to={it.path}
-                            className="block text-sm text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 truncate"
-                          >
-                            {it.label}
-                          </Link>
-                        ))}
+                <span className="flex-1 text-left">Starred</span>
+                {starredOpen ? (
+                  <ChevronDown className="w-4 h-4" />
+                ) : (
+                  <ChevronRight className="w-4 h-4" />
+                )}
+              </button>
+              {starredOpen && (
+                <div className="space-y-2">
+                  {(['project', 'task', 'team'] as const).map((entity) => {
+                    const items = getStarred(entity, user?.id);
+                    if (!items.length) return null;
+                    const title = entity === 'project' ? 'Projects' : entity === 'task' ? 'Tasks' : 'Teams';
+                    return (
+                      <div key={entity} className="px-3">
+                        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{title}</div>
+                        <div className="space-y-1">
+                          {items.slice(0, 5).map((it) => (
+                            <Link
+                              key={it.id}
+                              to={it.path}
+                              className="block text-sm text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 truncate"
+                            >
+                              {it.label}
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-                {!getStarred('project', user?.id).length &&
-                  !getStarred('task', user?.id).length &&
-                  !getStarred('team', user?.id).length && (
-                    <div className="px-3 text-sm text-gray-400 dark:text-gray-500 italic">No starred items</div>
-                  )}
-              </div>
+                    );
+                  })}
+                  {!getStarred('project', user?.id).length &&
+                    !getStarred('task', user?.id).length &&
+                    !getStarred('team', user?.id).length && (
+                      <div className="px-3 text-sm text-gray-400 dark:text-gray-500 italic">No starred items</div>
+                    )}
+                </div>
+              )}
             </div>
           </div>
         )}
